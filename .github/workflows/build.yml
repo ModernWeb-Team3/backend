@@ -50,6 +50,6 @@ jobs:
 
       - name: "Deploy to Portainer"
         run: |
-          curl -H "X-API-Key: $token" -H "Content-Type: application/json" -X PUT https://portainer.unideal.kr/api/stacks/4 --data '{"id": 4, "PullImage": true}'
+          curl -H "X-API-Key: $token" -H "Content-Type: application/json" -X PUT https://portainer.unideal.kr/api/stacks/4?endpointId=3 --data '{"id": 4, "PullImage": true}'
         env:
           token: ${{ secrets.PORTAINER_ACCESS_TOKEN }}
