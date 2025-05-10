@@ -76,5 +76,5 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add backend/docker-compose.yml
-          git commit -m "Update backend image tag to ${GITHUB_SHA::7}"
+          git commit -m "ci: update backend tag to ${GITHUB_SHA::7}"
           git push
