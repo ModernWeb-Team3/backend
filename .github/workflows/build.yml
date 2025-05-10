@@ -64,7 +64,7 @@ jobs:
         with:
           repository: modernweb-team3/GitOps
           path: gitops
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITOPS_TOKEN }}
 
       - name: Update docker-compose.yml image tag
         run: |
