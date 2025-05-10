@@ -9,7 +9,7 @@ RUN echo "Etc/UTC" > /etc/timezone
 RUN apk --no-cache add curl
 
 # Extract Server Jar
-ARG JAR_FILE=build/libs/unideal-backend*.jar
+ARG JAR_FILE=build/libs/backend*.jar
 COPY ${JAR_FILE} unideal-backend.jar
 
 # healthcheck - TODO: implement when healthcheck is implemented
