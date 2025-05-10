@@ -1,4 +1,4 @@
-package me.alex4386.gachon.sw14856.week10;
+package kr.unideal.server.backend;
 
 
 import io.swagger.v3.oas.annotations.Hidden;
