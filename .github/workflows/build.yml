@@ -36,13 +36,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: "Set short SHA tag"
+        id: set_tag
+        run: echo "tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
       - name: "Extract metadata (tags, labels) for Docker"
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            sha-${{ github.sha }}
+          tags: ${{ steps.set_tag.outputs.tag }}
 
       - name: "Build and push Docker image"
         uses: docker/build-push-action@v5
@@ -59,7 +62,7 @@ jobs:
       - name: Clone GitOps repository
         uses: actions/checkout@v4
         with:
-          repository: your-org/gitops-repo
+          repository: modernweb-team3/GitOps
           path: gitops
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -68,7 +71,7 @@ jobs:
           FILE="gitops/backend/docker-compose.yml"
           IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${GITHUB_SHA::7}"
           # Use sed to replace the image line (assuming unique keyword 'ghcr.io')
-          sed -i "s|image: .*|image: $IMAGE|" "$FILE"
+          sed -i "s|^\(\s*image:\s*\)ghcr.io.*|\1$IMAGE|" "$FILE"
 
       - name: Commit and push changes
         working-directory: gitops
