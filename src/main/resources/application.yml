@@ -1,10 +1,6 @@
 spring:
   application:
     name: unideal
-  datasource:
-    # TODO: Implement proper datasource
-    url:
-    driver-class-name:
   jpa:
     hibernate:
       ddl-auto: update
