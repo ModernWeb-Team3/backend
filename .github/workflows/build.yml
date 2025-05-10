@@ -8,6 +8,7 @@ env:
 
 jobs:
   build:
+    environment: deploy
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -49,4 +50,6 @@ jobs:
 
       - name: "Deploy to Portainer"
         run: |
-          curl -H "Authorization: Bearer $token" -H "Content-Type: application/json" -X PUT https://portainer.unideal.kr/api/stacks/4 --data '{"id": 4, "PullImage": true}' 
+          curl -H "Authorization: Bearer $token" -H "Content-Type: application/json" -X PUT https://portainer.unideal.kr/api/stacks/4 --data '{"id": 4, "PullImage": true}'
+        env:
+          token: ${{ secrets.PORTAINER_ACCESS_TOKEN }}
