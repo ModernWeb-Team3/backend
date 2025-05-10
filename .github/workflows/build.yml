@@ -8,7 +8,9 @@ env:
 
 jobs:
   build:
-    environment: deploy
+    environment:
+      name: deploy
+      url: https://api.unideal.kr
     runs-on: ubuntu-latest
     permissions:
       contents: read
