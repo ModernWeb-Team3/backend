@@ -46,3 +46,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           file: Dockerfile
+
+      - name: "Deploy to Portainer"
+        run: |
+          curl -H "Authorization: Bearer $token" -H "Content-Type: application/json" -X PUT https://portainer.unideal.kr/api/stacks/4 --data '{"id": 4, "PullImage": true}' 
