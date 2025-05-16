@@ -1,7 +1,10 @@
 package kr.unideal.server.backend.controller;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import kr.unideal.server.backend.dto.LogInRequestDTO;
 import kr.unideal.server.backend.dto.SignUpRequestDTO;
+import kr.unideal.server.backend.entity.User;
 import kr.unideal.server.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,9 +25,12 @@ public class AuthController {
         return "signup";
     }
 
+
+    //login 페이지 Get
     @GetMapping("/login")
     public String loginPage(Model model) {
-        model.addAttribute("logInRequestDTO", new L)
+        model.addAttribute("logInRequestDTO", new LogInRequestDTO());
+        return "login";
     }
 
     @PostMapping("/auth/signup")
@@ -45,5 +51,25 @@ public class AuthController {
         }
 
         return "redirect:/login";
+    }
+
+    @PostMapping("/auth/login")
+    public String login(@ModelAttribute @Valid LogInRequestDTO loginRequestDTO,
+                        BindingResult bindingResult,
+                        Model model,
+                        HttpSession session) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("error", "입력값을 다시 확인해주세요.");
+            return "login";
+        }
+
+        try {
+            User user = userService.login(loginRequestDTO);
+            session.setAttribute("user", user); // 로그인 상태 저장
+            return "redirect:/"; // 홈 또는 마이페이지 등으로 이동
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "login";
+        }
     }
 }
