@@ -1,7 +1,7 @@
 package kr.unideal.server.backend.domain.post.controller;
 
-import kr.unideal.server.backend.domain.post.dto.request.PostRequest;
-import kr.unideal.server.backend.domain.post.dto.response.PostResponse;
+import kr.unideal.server.backend.domain.post.controller.dto.request.PostRequest;
+import kr.unideal.server.backend.domain.post.controller.dto.response.PostResponse;
 import kr.unideal.server.backend.domain.post.entity.Post;
 import kr.unideal.server.backend.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class PostController {
     @GetMapping  // 실제 URL: /posts
     public List<PostResponse> getAllPosts() {
         return postRepository.findByStatusOrderByCreatedAtDesc("노출").stream()
-                .map(this::convertToResponse)
+                .map(PostResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -32,7 +32,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponse> getPost(@PathVariable Long postId) {
         return postRepository.findById(postId)
-                .map(post -> ResponseEntity.ok(convertToResponse(post)))
+                .map(post -> ResponseEntity.ok(PostResponse.from(post)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -45,7 +45,7 @@ public class PostController {
                 .price(request.getPrice())
                 .status(request.getStatus())
                 .build();
-        return ResponseEntity.ok(convertToResponse(postRepository.save(post)));
+        return ResponseEntity.ok(PostResponse.from(postRepository.save(post)));
     }
 
     // 🔹 PUT /posts/{postId} - 수정
@@ -59,7 +59,7 @@ public class PostController {
         post.setDetail(request.getDetail());
         post.setPrice(request.getPrice());
         post.setStatus(request.getStatus());
-        return ResponseEntity.ok(convertToResponse(postRepository.save(post)));
+        return ResponseEntity.ok(PostResponse.from(postRepository.save(post)));
     }
 
     // 🔹 DELETE /posts/{postId} - 삭제
@@ -78,33 +78,34 @@ public class PostController {
 
         Post post = optionalPost.get();
         post.setStatus(status);
-        return ResponseEntity.ok(convertToResponse(postRepository.save(post)));
+        return ResponseEntity.ok(PostResponse.from(postRepository.save(post)));
     }
 
-    // 🔹 댓글 관련은 별도 CommentController로 분리 권장
-    @GetMapping("/{postId}/comments")
-    public String getComments(@PathVariable Long postId) {
-        return "댓글 리스트 조회 기능은 구현 예정";
-    }
+//    // 🔹 댓글 관련은 별도 CommentController로 분리 권장
+//    @GetMapping("/{postId}/comments")
+//    public String getComments(@PathVariable Long postId) {
+//        return "댓글 리스트 조회 기능은 구현 예정";
+//    }
+//
+//    @PostMapping("/{postId}/comments")
+//    public String createComment(@PathVariable Long postId) {
+//        return "댓글 생성 기능은 구현 예정";
+//    }
+//
+//    @DeleteMapping("/{postId}/comments/{commentId}/delete")
+//    public String deleteComment(@PathVariable Long postId, @PathVariable Long commentId) {
+//        return "댓글 삭제 기능은 구현 예정";
+//    }
 
-    @PostMapping("/{postId}/comments")
-    public String createComment(@PathVariable Long postId) {
-        return "댓글 생성 기능은 구현 예정";
-    }
+    // 내부 변환 -> toDto -> PostResponse 에 추가
 
-    @DeleteMapping("/{postId}/comments/{commentId}/delete")
-    public String deleteComment(@PathVariable Long postId, @PathVariable Long commentId) {
-        return "댓글 삭제 기능은 구현 예정";
-    }
-
-    // 내부 변환
-    private PostResponse convertToResponse(Post post) {
-        return PostResponse.builder()
-                .id(post.getId())
-                .name(post.getName())
-                .detail(post.getDetail())
-                .price(post.getPrice())
-                .status(post.getStatus())
-                .build();
-    }
+//    private PostResponse convertToResponse(Post post) {
+//        return PostResponse.builder()
+//                .id(post.getId())
+//                .name(post.getName())
+//                .detail(post.getDetail())
+//                .price(post.getPrice())
+//                .status(post.getStatus())
+//                .build();
+//    }
 }

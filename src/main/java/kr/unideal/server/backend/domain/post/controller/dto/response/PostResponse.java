@@ -1,5 +1,6 @@
 package kr.unideal.server.backend.domain.post.controller.dto.response;
 
+import kr.unideal.server.backend.domain.post.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,4 +15,14 @@ public class PostResponse {
     private Integer price;   // 가격
     private String status;   // 상태 (노출/숨김)
 
+    //toDto
+    public static PostResponse from(Post post) {
+        return PostResponse.builder()
+                .id(post.getId())
+                .name(post.getName())
+                .detail(post.getDetail())
+                .price(post.getPrice())
+                .status(post.getStatus())
+                .build();
+    }
 }

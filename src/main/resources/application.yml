@@ -2,7 +2,7 @@ spring:
   application:
     name: unideal
   datasource:
-    url: jdbc:mysql://localhost:3306/unideal
+    url: jdbc:mysql://localhost:3306/unideal?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: unideal
     password: unideal
     driver-class-name: com.mysql.cj.jdbc.Driver

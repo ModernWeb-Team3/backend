@@ -42,14 +42,24 @@ public class PostService {
         }
         postRepository.deleteById(postId);
     }
+//
+//     전체 post 목록 조회 -> 수정 필요
+//        public List<PostResponse> getAllPosts() {
+//            return postRepository.findByStatusAndCategoryOrderByCreatedAtDesc("노출", null)
+//                    .stream()
+//                    .map(this::convertToResponse)
+//                    .collect(Collectors.toList());
+//        }
 
-    // 전체 post 목록 조회 -> 수정 필요
     public List<PostResponse> getAllPosts() {
-        return postRepository.findByStatusAndCategoryOrderByCreatedAtDesc("노출", null)
+        return postRepository.findByStatusOrderByCreatedAtDesc("노출")
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
+
+
+
 
     // 특정 post 상세 조회
     public PostResponse getPost(Long postId) {
