@@ -1,11 +1,18 @@
 spring:
   application:
     name: unideal
+  datasource:
+    url: jdbc:mysql://localhost:3306/unideal
+    username: unideal
+    password: unideal
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
     # Verbose logging for SQL
     show-sql: true
+
 
 springdoc:
   api-docs:

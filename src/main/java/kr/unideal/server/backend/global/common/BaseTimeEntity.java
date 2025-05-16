@@ -1,9 +1,8 @@
-package com.jiyoung.kikihi.platform.adapter.out.jpa;
+package kr.unideal.server.backend.global.common;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
