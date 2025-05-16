@@ -1,8 +1,8 @@
-package kr.unideal.server.backend.domain.comment.domain;
+package kr.unideal.server.backend.domain.comment.entity;
 
 import jakarta.persistence.*;
-import kr.unideal.server.backend.domain.post.domain.Post;
-import kr.unideal.server.backend.domain.user.domain.User;
+import kr.unideal.server.backend.domain.post.entity.Post;
+import kr.unideal.server.backend.domain.user.entity.User;
 import kr.unideal.server.backend.global.common.BaseTimeEntity;
 import lombok.*;
 

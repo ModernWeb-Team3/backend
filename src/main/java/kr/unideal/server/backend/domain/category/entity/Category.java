@@ -1,4 +1,4 @@
-package kr.unideal.server.backend.domain.category.domain;
+package kr.unideal.server.backend.domain.category.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

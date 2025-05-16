@@ -1,4 +1,4 @@
-package kr.unideal.server.backend.domain.user.domain;
+package kr.unideal.server.backend.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
