@@ -2,7 +2,7 @@ package kr.unideal.server.backend.domain.post.service;
 
 import kr.unideal.server.backend.domain.post.controller.dto.request.PostRequest;
 import kr.unideal.server.backend.domain.post.controller.dto.response.PostResponse;
-import kr.unideal.server.backend.domain.post.domain.Post;
+import kr.unideal.server.backend.domain.post.entity.Post;
 import kr.unideal.server.backend.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

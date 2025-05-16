@@ -1,7 +1,7 @@
 package kr.unideal.server.backend.domain.comment.repository;
 
 
-import kr.unideal.server.backend.domain.comment.domain.Comment;
+import kr.unideal.server.backend.domain.comment.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

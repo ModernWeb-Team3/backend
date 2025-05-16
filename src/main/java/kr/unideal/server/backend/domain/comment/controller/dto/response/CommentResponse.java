@@ -1,6 +1,6 @@
 package kr.unideal.server.backend.domain.comment.controller.dto.response;
 
-import kr.unideal.server.backend.domain.comment.domain.Comment;
+import kr.unideal.server.backend.domain.comment.entity.Comment;
 
 
 public record CommentResponse(

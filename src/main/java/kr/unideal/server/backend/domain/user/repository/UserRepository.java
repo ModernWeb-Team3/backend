@@ -1,6 +1,6 @@
 package kr.unideal.server.backend.domain.user.repository;
 
-import kr.unideal.server.backend.domain.user.domain.User;
+import kr.unideal.server.backend.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
