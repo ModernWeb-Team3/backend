@@ -2,15 +2,16 @@ package kr.unideal.server.backend.domain.comment.domain;
 
 import jakarta.persistence.*;
 import kr.unideal.server.backend.domain.post.domain.Post;
+import kr.unideal.server.backend.domain.user.domain.User;
 import kr.unideal.server.backend.global.common.BaseTimeEntity;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "comment")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,6 +20,12 @@ public class Comment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(columnDefinition = "TEXT")
+    private String content;
+
+    @Column(nullable = false)
+    private boolean secret = false;
 
     // 어떤 게시글(Post)에 달린 댓글인지
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,12 +38,31 @@ public class Comment extends BaseTimeEntity {
     private Comment parent;
 
     // 대댓글 목록
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Comment> replies;
+    @Builder.Default
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> replies = new ArrayList<>();
 
-    @Column(columnDefinition = "TEXT")
-    private String content;
 
-    private boolean secret; // 비공개 여부
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+
+    // 생성자
+    public static Comment of(User user, String content, Post post, Comment parent) {
+        return Comment.builder()
+                .user(user)
+                .post(post)
+                .content(content)
+                .parent(parent)
+                .secret(false)
+                .build();
+    }
+
+    // 도메인 메서드
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
 
 }

@@ -1,0 +1,14 @@
+package kr.unideal.server.backend.domain.user.repository;
+
+import kr.unideal.server.backend.domain.user.domain.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    //존재하는 이메일인지 확인
+    boolean existsByEmail(String email);
+
+    //user의 데이터를 email로 찾음
+    Optional<User> findByEmail(String email);
+}
