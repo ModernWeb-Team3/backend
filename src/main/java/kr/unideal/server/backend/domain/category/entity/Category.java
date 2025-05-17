@@ -15,5 +15,5 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // ex) 책, 의류, 전공물품 등
+    private String name; // ex) 책, 의류, 전공물품, 기타 등
 }

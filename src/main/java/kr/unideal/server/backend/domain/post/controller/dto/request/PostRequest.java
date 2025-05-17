@@ -12,4 +12,5 @@ public class PostRequest {
     private Integer price;
     private String status;
 
+    private Long categoryId;
 }

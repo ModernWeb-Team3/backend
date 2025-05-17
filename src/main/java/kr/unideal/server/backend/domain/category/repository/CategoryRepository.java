@@ -1,4 +1,9 @@
 package kr.unideal.server.backend.domain.category.repository;
 
-public class CategoryRepository {
+import kr.unideal.server.backend.domain.category.entity.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface CategoryRepository extends JpaRepository<Category, Long> {
 }

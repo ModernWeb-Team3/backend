@@ -16,6 +16,8 @@ public class PostResponse {
     private String status;   // 상태 (노출/숨김)
 
     //toDto
+    private String category; // 카테고리 이름
+
     public static PostResponse from(Post post) {
         return PostResponse.builder()
                 .id(post.getId())
@@ -23,6 +25,7 @@ public class PostResponse {
                 .detail(post.getDetail())
                 .price(post.getPrice())
                 .status(post.getStatus())
+                .category(post.getCategory() != null ? post.getCategory().getName() : null)
                 .build();
     }
 }
