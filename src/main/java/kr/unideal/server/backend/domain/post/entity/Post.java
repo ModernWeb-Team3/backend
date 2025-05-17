@@ -4,7 +4,11 @@ import jakarta.persistence.*;
 import kr.unideal.server.backend.domain.category.entity.Category;
 import kr.unideal.server.backend.domain.user.entity.User;
 import kr.unideal.server.backend.global.common.BaseTimeEntity;
+import kr.unideal.server.backend.domain.image.entity.Image;
+
 import lombok.*;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "post")
@@ -35,6 +39,10 @@ public class Post extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
+
 
     public void updatePost(String name, String detail, Integer price, String status) {
         this.name = name;

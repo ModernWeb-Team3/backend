@@ -3,9 +3,12 @@ package kr.unideal.server.backend.domain.post.service;
 import kr.unideal.server.backend.domain.post.controller.dto.request.PostRequest;
 import kr.unideal.server.backend.domain.post.controller.dto.response.PostResponse;
 import kr.unideal.server.backend.domain.post.entity.Post;
-import kr.unideal.server.backend.domain.post.repository.PostRepository;
 import kr.unideal.server.backend.domain.category.entity.Category;
+import kr.unideal.server.backend.domain.image.entity.Image;
+import kr.unideal.server.backend.domain.post.repository.PostRepository;
 import kr.unideal.server.backend.domain.category.repository.CategoryRepository;
+import kr.unideal.server.backend.domain.image.repository.ImageRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,9 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
 
+
+    private final ImageRepository imageRepository;  // 주입 추가
+
     // post 생성
     public void createPost(PostRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
@@ -29,10 +35,23 @@ public class PostService {
                 .detail(request.getDetail())
                 .price(request.getPrice())
                 .status(request.getStatus())
-                .category(category) // 🔥 여기에 실제 Category 객체 연결
+                .category(category) // 여기에 실제 Category 객체 연결
                 .build();
 
         postRepository.save(post);
+
+        List<String> urls = request.getImageUrls();
+        if (urls != null && urls.size() <= 3) {
+            List<Image> images = urls.stream()
+                    .map(url -> Image.builder()
+                            .url(url)
+                            .post(post)
+                            .build())
+                    .toList();
+            imageRepository.saveAll(images);
+        } else if (urls != null) {
+            throw new IllegalArgumentException("이미지는 최대 3장까지만 등록 가능합니다.");
+        }
     }
 
     // post 수정

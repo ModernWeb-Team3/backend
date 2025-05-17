@@ -18,7 +18,7 @@ public class Image {
 
     private String url; // 이미지 저장된 경로 또는 URL
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post; // 이미지가 속한 게시글
 }
