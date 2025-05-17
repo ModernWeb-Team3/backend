@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Getter
@@ -33,7 +34,7 @@ public class PostResponse {
                         post.getImages().stream()
                                 .map(Image::getUrl)
                                 .collect(Collectors.toList())
-                        : null)  //  이미지 URL 리스트 포함
+                        : new ArrayList<>()) // null 방지
                 .build();
     }
 }

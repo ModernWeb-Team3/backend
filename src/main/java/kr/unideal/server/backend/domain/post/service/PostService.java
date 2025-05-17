@@ -8,10 +8,12 @@ import kr.unideal.server.backend.domain.image.entity.Image;
 import kr.unideal.server.backend.domain.post.repository.PostRepository;
 import kr.unideal.server.backend.domain.category.repository.CategoryRepository;
 import kr.unideal.server.backend.domain.image.repository.ImageRepository;
+import kr.unideal.server.backend.domain.image.controller.dto.request.ImageRequest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,8 +64,31 @@ public class PostService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
 
+        // 기본 정보 업데이트
         post.updatePost(request.getName(), request.getDetail(), request.getPrice(), request.getStatus());
-        post.setCategory(category); // 🔥 카테고리도 반영해야 함!
+        post.setCategory(category);
+
+        // 이미지 업데이트 로직 추가
+        List<ImageRequest> imageRequests = request.getImages();
+        if (imageRequests != null) {
+
+            // 삭제할 이미지 찾기
+            List<Image> toDelete = post.getImages().stream()
+                    .filter(existing -> imageRequests.stream()
+                            .anyMatch(req -> req.getId() != null && req.isDelete() && req.getId().equals(existing.getId())))
+                    .collect(Collectors.toList());
+            post.getImages().removeAll(toDelete);  // 삭제 적용됨 (orphanRemoval = true)
+
+            // 새 이미지 추가
+            List<Image> toAdd = imageRequests.stream()
+                    .filter(req -> req.getId() == null && !req.isDelete())
+                    .map(req -> Image.builder()
+                            .url(req.getUrl())
+                            .post(post)
+                            .build())
+                    .collect(Collectors.toList());
+            post.getImages().addAll(toAdd);
+        }
 
         return convertToResponse(postRepository.save(post));
     }
@@ -125,6 +150,11 @@ public class PostService {
                 .price(post.getPrice())
                 .status(post.getStatus())
                 .category(post.getCategory() != null ? post.getCategory().getName() : null)
+                .imageUrls(post.getImages() != null
+                        ? post.getImages().stream()
+                        .map(Image::getUrl)
+                        .collect(Collectors.toList())
+                        : new ArrayList<>()) // null 방지
                 .build();
     }
 }

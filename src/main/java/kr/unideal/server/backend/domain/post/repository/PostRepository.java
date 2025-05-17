@@ -14,4 +14,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 특정 카테고리 ID에 해당하는 게시글 목록 조회
     // 카테고리 + 노출 상태
     List<Post> findByCategoryIdAndStatusOrderByCreatedAtDesc(Long categoryId, String status);
+
 }
