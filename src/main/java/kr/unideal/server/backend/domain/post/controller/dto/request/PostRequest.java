@@ -1,5 +1,6 @@
 package kr.unideal.server.backend.domain.post.controller.dto.request;
 
+import kr.unideal.server.backend.domain.location.entity.LocationType;
 import kr.unideal.server.backend.domain.image.controller.dto.request.ImageRequest;
 import lombok.Getter;
 import java.util.List;
@@ -17,4 +18,6 @@ public class PostRequest {
 
     private List<String> imageUrls; // 추가
     private List<ImageRequest> images; // 수정용 이미지 요청 리스트
+
+    private LocationType location;
 }

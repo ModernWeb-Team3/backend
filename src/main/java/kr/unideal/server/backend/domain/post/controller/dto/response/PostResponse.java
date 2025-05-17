@@ -21,6 +21,7 @@ public class PostResponse {
     private String status;   // 상태 (노출/숨김)
     private String category; // 카테고리 이름
     private List<String> imageUrls;  //  추가
+    private String location; // 출력은 한글 표시용
 
     public static PostResponse from(Post post) {
         return PostResponse.builder()
@@ -35,6 +36,7 @@ public class PostResponse {
                                 .map(Image::getUrl)
                                 .collect(Collectors.toList())
                         : new ArrayList<>()) // null 방지
+                .location(post.getLocation() != null ? post.getLocation().getLabel() : null)
                 .build();
     }
 }

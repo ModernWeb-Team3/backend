@@ -5,7 +5,7 @@ import kr.unideal.server.backend.domain.category.entity.Category;
 import kr.unideal.server.backend.domain.user.entity.User;
 import kr.unideal.server.backend.global.common.BaseTimeEntity;
 import kr.unideal.server.backend.domain.image.entity.Image;
-
+import kr.unideal.server.backend.domain.location.entity.LocationType;
 import lombok.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -43,6 +43,9 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Image> images = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "location")
+    private LocationType location;
 
     public void updatePost(String name, String detail, Integer price, String status) {
         this.name = name;
@@ -54,9 +57,5 @@ public class Post extends BaseTimeEntity {
     public void updateStatus(String status) {
         this.status=status;
     }
-
-//    @ManyToOne
-//    @JoinColumn(name = "location_id")
-//     private Location location;
-
 }
+

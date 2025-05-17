@@ -38,6 +38,7 @@ public class PostService {
                 .price(request.getPrice())
                 .status(request.getStatus())
                 .category(category) // 여기에 실제 Category 객체 연결
+                .location(request.getLocation()) // 추가
                 .build();
 
         postRepository.save(post);
@@ -67,6 +68,7 @@ public class PostService {
         // 기본 정보 업데이트
         post.updatePost(request.getName(), request.getDetail(), request.getPrice(), request.getStatus());
         post.setCategory(category);
+        post.setLocation(request.getLocation());
 
         // 이미지 업데이트 로직 추가
         List<ImageRequest> imageRequests = request.getImages();
@@ -143,18 +145,6 @@ public class PostService {
     }
 
     private PostResponse convertToResponse(Post post) {
-        return PostResponse.builder()
-                .id(post.getId())
-                .name(post.getName())
-                .detail(post.getDetail())
-                .price(post.getPrice())
-                .status(post.getStatus())
-                .category(post.getCategory() != null ? post.getCategory().getName() : null)
-                .imageUrls(post.getImages() != null
-                        ? post.getImages().stream()
-                        .map(Image::getUrl)
-                        .collect(Collectors.toList())
-                        : new ArrayList<>()) // null 방지
-                .build();
+        return PostResponse.from(post);
     }
 }
