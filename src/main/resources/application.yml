@@ -11,6 +11,11 @@ spring:
     url: jdbc:mysql://localhost:3306/UniDeal
     username: root
     password: 'tndk1008'
+  jwt:
+    token:
+      secretKey: 6vOaMyJYfYpKzT0gYCw6FSFBsi9xA962
+      expiration:
+        access: 14400000
 
 springdoc:
   api-docs:

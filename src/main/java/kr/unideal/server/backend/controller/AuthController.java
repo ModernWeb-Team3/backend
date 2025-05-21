@@ -3,10 +3,12 @@ package kr.unideal.server.backend.controller;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import kr.unideal.server.backend.dto.LogInRequestDTO;
+import kr.unideal.server.backend.dto.LogInResponseDTO;
 import kr.unideal.server.backend.dto.SignUpRequestDTO;
 import kr.unideal.server.backend.entity.User;
 import kr.unideal.server.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -51,25 +53,35 @@ public class AuthController {
         }
 
         return "redirect:/login";
-    }
+    };
 
     @PostMapping("/auth/login")
-    public String login(@ModelAttribute @Valid LogInRequestDTO loginRequestDTO,
-                        BindingResult bindingResult,
-                        Model model,
-                        HttpSession session) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("error", "입력값을 다시 확인해주세요.");
-            return "login";
-        }
-
+    public ResponseEntity<LogInResponseDTO> login(@RequestBody @Valid LogInRequestDTO loginRequestDTO) {
         try {
-            User user = userService.login(loginRequestDTO);
-            session.setAttribute("user", user); // 로그인 상태 저장
-            return "redirect:/"; // 홈 또는 마이페이지 등으로 이동
+            LogInResponseDTO response = userService.loginMember(loginRequestDTO);
+            return ResponseEntity.ok(response); // ✅ 토큰 포함 응답
         } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            return "login";
+            return ResponseEntity.badRequest().build(); // 또는 에러 메시지 반환
         }
     }
+
+//    @PostMapping("/auth/login")
+//    public String login(@ModelAttribute @Valid LogInRequestDTO loginRequestDTO,
+//                        BindingResult bindingResult,
+//                        Model model,
+//                        HttpSession session) {
+//        if (bindingResult.hasErrors()) {
+//            model.addAttribute("error", "입력값을 다시 확인해주세요.");
+//            return "login";
+//        }
+//
+//        try {
+//            User user = userService.login(loginRequestDTO);
+//            session.setAttribute("user", user); // 로그인 상태 저장
+//            return "redirect:/"; // 홈 또는 마이페이지 등으로 이동
+//        } catch (IllegalArgumentException e) {
+//            model.addAttribute("error", e.getMessage());
+//            return "login";
+//        }
+//    }
 }
