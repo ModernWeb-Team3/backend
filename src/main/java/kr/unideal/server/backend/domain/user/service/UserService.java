@@ -1,12 +1,13 @@
-package kr.unideal.server.backend.service;
+package kr.unideal.server.backend.domain.user.service;
 
 
 import kr.unideal.server.backend.config.security.JwtTokenProvider;
-import kr.unideal.server.backend.dto.LogInRequestDTO;
-import kr.unideal.server.backend.dto.LogInResponseDTO;
-import kr.unideal.server.backend.dto.SignUpRequestDTO;
-import kr.unideal.server.backend.entity.User;
-import kr.unideal.server.backend.repository.UserRepository;
+import kr.unideal.server.backend.domain.user.dto.LogInRequestDTO;
+import kr.unideal.server.backend.domain.user.dto.LogInResponseDTO;
+import kr.unideal.server.backend.domain.user.dto.SignUpRequestDTO;
+
+import kr.unideal.server.backend.domain.user.entity.User;
+import kr.unideal.server.backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
