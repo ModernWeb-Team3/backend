@@ -12,6 +12,16 @@ spring:
       ddl-auto: update
     # Verbose logging for SQL
     show-sql: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/UniDeal
+    username: root
+    password: 'tndk1008'
+  jwt:
+    token:
+      secretKey: 6vOaMyJYfYpKzT0gYCw6FSFBsi9xA962
+      expiration:
+        access: 14400000
 
 
 springdoc:
