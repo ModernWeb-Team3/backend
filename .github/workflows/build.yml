@@ -26,6 +26,11 @@ jobs:
       - name: 'Set up Docker Buildx'
         uses: docker/setup-buildx-action@v3
 
+      - name: 'Replace application.yml for docker deployment'
+        run: |
+          rm ./src/main/resources/application.yml
+          mv ./src/main/resources/application.docker.yml ./src/main/resources/application.yml
+
       - name: 'Run gradlew build'
         run: ./gradlew build
 

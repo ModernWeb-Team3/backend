@@ -1,8 +1,12 @@
 package kr.unideal.server.backend.entity;
 
 import jakarta.persistence.*;
+import kr.unideal.server.backend.utils.VerificationCodeUtils;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "`user`") // user는 예약어이므로 백틱 사용

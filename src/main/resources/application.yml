@@ -8,10 +8,28 @@ spring:
     show-sql: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+    # == this is only for local deployments ==
+    # For more information, check ./application.docker.yml
     url: jdbc:mysql://localhost:3306/UniDeal
     username: root
     password: 'tndk1008'
+  mail:
+    host: smtp.google.com
+    port: 587
+    username: username@example.com
+    password: password12
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 springdoc:
   api-docs:
     path: /openapi
+
+unideal:
+  mailer:
+    from: test-mail@gmail.com
+

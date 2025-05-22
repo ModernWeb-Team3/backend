@@ -1,75 +1,74 @@
 package kr.unideal.server.backend.controller;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-import kr.unideal.server.backend.dto.LogInRequestDTO;
-import kr.unideal.server.backend.dto.SignUpRequestDTO;
-import kr.unideal.server.backend.entity.User;
+import kr.unideal.server.backend.dto.*;
 import kr.unideal.server.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class AuthController {
 
     private final UserService userService;
 
-    //signup 페이지 GET
-    @GetMapping("/signup")
-    public String signupPage(Model model) {
-        model.addAttribute("signUpRequestDTO", new SignUpRequestDTO());
-        return "signup";
-    }
-
-
-    //login 페이지 Get
-    @GetMapping("/login")
-    public String loginPage(Model model) {
-        model.addAttribute("logInRequestDTO", new LogInRequestDTO());
-        return "login";
-    }
-
     @PostMapping("/auth/signup")
-    public String signup(@Valid @ModelAttribute SignUpRequestDTO signUpRequestDTO,
-                         BindingResult bindingResult,
-                         Model model) {
+    public ResponseEntity<SignUpResponseDTO> signup(
+            @RequestBody SignUpRequestDTO signUpRequestDTO,
+            BindingResult bindingResult
+    ) {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("error", "입력값을 다시 확인해주세요.");
-            return "signup";
+            throw new IllegalArgumentException("입력값 규격이 올바르지 않습니다.");
         }
 
         try {
             userService.register(signUpRequestDTO);
         } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            return "signup";
+            throw e;
         }
 
-        return "redirect:/login";
+        return ResponseEntity.ok(
+                new SignUpResponseDTO()
+        );
     }
 
-    @PostMapping("/auth/login")
-    public String login(@ModelAttribute @Valid LogInRequestDTO loginRequestDTO,
-                        BindingResult bindingResult,
-                        Model model,
-                        HttpSession session) {
+    // 인증번호 기반 코드 인증 시도
+    @PostMapping("/auth/validate")
+    public ResponseEntity<VerifyResponseDTO> validate(@RequestBody VerifyRequestDTO verifyRequestDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("error", "입력값을 다시 확인해주세요.");
-            return "login";
+            throw new IllegalArgumentException("입력값 규격이 올바르지 않습니다.");
         }
 
         try {
-            User user = userService.login(loginRequestDTO);
-            session.setAttribute("user", user); // 로그인 상태 저장
-            return "redirect:/"; // 홈 또는 마이페이지 등으로 이동
+            userService.verifyUser(verifyRequestDTO);
         } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            return "login";
+            throw e;
         }
+
+        return ResponseEntity.ok(
+                new VerifyResponseDTO()
+        );
+    }
+
+    @PostMapping("/auth/login")
+    public ResponseEntity<LogInResponseDTO> login(
+            @RequestBody LogInRequestDTO logInRequestDTO,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            throw new IllegalArgumentException("입력값 규격이 올바르지 않습니다.");
+        }
+
+        try {
+            userService.login(logInRequestDTO);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+
+        return ResponseEntity.ok(
+                new LogInResponseDTO()
+        );
     }
 }

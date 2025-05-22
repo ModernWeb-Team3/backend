@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: unideal
+  jpa:
+    hibernate:
+      ddl-auto: update
+    # Verbose logging for SQL
+    show-sql: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # NOTE: Do NOT set the db configuration here,
+    #       This would be set by the docker-compose via environment variable.
+    #
+    #       For more information, Check the following link:
+    #       https://docs.spring.io/spring-boot/docs/3.0.4/reference/html/features.html#features.external-config
+    #       If you configure in this file, the environment variables are automatically overridden,
+    #       causing invalid configuration. If you need to configure some of the parameters, reach me @ Kakaotalk.
+
+springdoc:
+  api-docs:
+    path: /openapi
+
+unideal:
+  mailer:
+    from: test-mail@gmail.com
