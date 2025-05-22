@@ -1,4 +1,4 @@
-package kr.unideal.server.backend.domain.user.dto;
+package kr.unideal.server.backend.domain.user.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class SignUpRequestDTO {
+public class SignUpRequest {
     @Getter
     @Setter
 
