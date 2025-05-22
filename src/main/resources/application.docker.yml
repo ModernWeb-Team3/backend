@@ -19,7 +19,3 @@ spring:
 springdoc:
   api-docs:
     path: /openapi
-
-unideal:
-  mailer:
-    from: test-mail@gmail.com
