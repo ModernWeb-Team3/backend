@@ -58,6 +58,9 @@ dependencies {
     // for handling validation
     implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 
+    // Email
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 }
 
 tasks.named('test') {
