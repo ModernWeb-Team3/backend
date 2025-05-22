@@ -1,4 +1,4 @@
-package kr.unideal.server.backend.dto;
+package kr.unideal.server.backend.domain.user.dto;
 
 public class LogInResponseDTO {
     int memberId;

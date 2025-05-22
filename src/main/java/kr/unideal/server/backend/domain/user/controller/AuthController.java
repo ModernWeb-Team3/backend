@@ -1,12 +1,10 @@
-package kr.unideal.server.backend.controller;
+package kr.unideal.server.backend.domain.user.controller;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import kr.unideal.server.backend.dto.LogInRequestDTO;
-import kr.unideal.server.backend.dto.LogInResponseDTO;
-import kr.unideal.server.backend.dto.SignUpRequestDTO;
-import kr.unideal.server.backend.entity.User;
-import kr.unideal.server.backend.service.UserService;
+import kr.unideal.server.backend.domain.user.dto.LogInRequestDTO;
+import kr.unideal.server.backend.domain.user.dto.LogInResponseDTO;
+import kr.unideal.server.backend.domain.user.dto.SignUpRequestDTO;
+import kr.unideal.server.backend.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
