@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -19,7 +20,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         (requests) -> requests
-                                .requestMatchers("/", "/login", "/signup","/auth/login", "/auth/signup", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/api/**", "/login", "/signup","/auth/login", "/auth/signup", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 // 권한제어부분은 필요 없어서 삭제
 //                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
@@ -30,9 +31,9 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 비밀번호 암호화 구현시 사용할 encoder입니다. 에러때문이 임시로 주석처리 해뒀습니다.
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 }

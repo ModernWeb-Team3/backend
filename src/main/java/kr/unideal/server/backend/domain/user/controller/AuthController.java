@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import kr.unideal.server.backend.domain.user.dto.request.EmailSendRequest;
 import kr.unideal.server.backend.domain.user.dto.request.EmailVerifyRequest;
 import kr.unideal.server.backend.domain.user.dto.request.LoginRequest;
+import kr.unideal.server.backend.domain.user.dto.request.SignUpRequest;
 import kr.unideal.server.backend.domain.user.dto.response.LoginResponse;
 import kr.unideal.server.backend.domain.user.exception.NotVerifiedException;
 import kr.unideal.server.backend.domain.user.service.EmailService;
@@ -35,6 +36,13 @@ public class AuthController {
         }
 
         return ApiResponse.ok("메일이 인증되었습니다.");
+    }
+
+    // 회원가입
+    @PostMapping("/register")
+    public ApiResponse<String> join(@RequestBody SignUpRequest request) {
+        userService.register(request);
+        return ApiResponse.ok("회원가입이 완료되었습니다.");
     }
 
     @PostMapping("/login")

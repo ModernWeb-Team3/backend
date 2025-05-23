@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import kr.unideal.server.backend.config.security.JwtTokenProvider;
 import kr.unideal.server.backend.domain.user.dto.CustomUserDetails;
 import kr.unideal.server.backend.domain.user.dto.request.LoginRequest;
+import kr.unideal.server.backend.domain.user.dto.request.SignUpRequest;
 import kr.unideal.server.backend.domain.user.dto.response.LoginResponse;
 import kr.unideal.server.backend.domain.user.entity.User;
 import kr.unideal.server.backend.domain.user.repository.UserRepository;
@@ -25,19 +26,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final EmailService emailService;
 
 
+    // 회원가입 db 등록 method
+    public void register(SignUpRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("이미 등록된 이메일입니다.");
+        }
+
+        User user =User.of(request);
+        user.setVerified(true);
+        //user.setVerificationToken(UUID.randomUUID().toString());
+
+        userRepository.save(user);
+    }
+
     public LoginResponse login(@RequestBody LoginRequest request) {
 
-        User user = repository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("해당하는 이메일을 사용하는 유저가 없습니다."));
 
         if (!bCryptPasswordEncoder.matches(request.getPassword(), user.getPassword())) {
-            repository.save(user);
+            userRepository.save(user);
             throw new BadCredentialsException("로그인 실패했습니다.");
         }
 

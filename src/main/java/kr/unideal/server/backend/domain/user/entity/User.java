@@ -1,13 +1,15 @@
 package kr.unideal.server.backend.domain.user.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import kr.unideal.server.backend.domain.user.dto.request.SignUpRequest;
+import lombok.*;
 
 @Entity
 @Table(name = "`user`") // user는 예약어이므로 백틱 사용
 @Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -28,4 +30,16 @@ public class User {
 
     @Column
     private String verificationToken;
+
+    public static User of(SignUpRequest request) {
+        return User.builder()
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .name(request.getName())
+                .build();
+    }
+
+    public void setVerified(boolean b) {
+        this.isVerified = b;
+    }
 }
