@@ -1,13 +1,13 @@
 services:
   db:
-    image: mariadb:latest
+    image: mysql:latest
     container_name: 'unideal-db'
     environment:
       # MYSQL_ROOT_PASSWORD: changeme
       MYSQL_DATABASE: unideal
       MYSQL_USER: unideal
       MYSQL_PASSWORD: changeme
-      MARIADB_RANDOM_ROOT_PASSWORD: 1
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
     volumes:
       - unideal-db_data:/var/lib/mysql
   app:
