@@ -14,3 +14,12 @@ services:
     volumes:
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/01-init.sql
     command: --default-authentication-plugin=mysql_native_password
+
+
+  # Redis
+  redis:
+    image: redis:7.2.5
+    container_name: unideal-redis
+    ports:
+      - '6379:6379'
+
