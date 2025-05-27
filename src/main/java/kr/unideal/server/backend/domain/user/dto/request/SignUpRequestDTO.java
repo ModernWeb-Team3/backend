@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class SignUpRequest {
+public class SignUpRequestDTO {
     @Getter
     @Setter
 
