@@ -1,12 +1,14 @@
 package kr.unideal.server.backend.domain.user.entity;
 
 import jakarta.persistence.*;
-import kr.unideal.server.backend.domain.user.dto.request.SignUpRequest;
+import kr.unideal.server.backend.domain.user.dto.request.SignUpRequestDTO;
+import kr.unideal.server.backend.domain.user.dto.response.LogInResponseDTO;
 import lombok.*;
 
 @Entity
 @Table(name = "`user`") // user는 예약어이므로 백틱 사용
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,22 +18,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     private String password;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String name;
 
-    @Column(nullable = false)
+    @Column
     private boolean isVerified = false;
 
-    @Column
-    private String verificationToken;
 
-    public static User of(SignUpRequest request) {
+
+    public static User of(SignUpRequestDTO request) {
         return User.builder()
                 .email(request.getEmail())
                 .password(request.getPassword())
@@ -42,4 +43,11 @@ public class User {
     public void setVerified(boolean b) {
         this.isVerified = b;
     }
+
+//    public LogInResponseDTO from(User user) {
+//        return LogInResponseDTO.builder()
+//                .email(user.getEmail())
+//                .jwtToken(user.getVerificationToken())
+//                .build();
+//    }
 }

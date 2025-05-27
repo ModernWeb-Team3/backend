@@ -10,6 +10,7 @@ import kr.unideal.server.backend.domain.post.entity.Post;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Setter
 public class Image {
 
     @Id

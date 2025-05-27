@@ -3,7 +3,7 @@ package kr.unideal.server.backend.domain.comment.entity;
 import jakarta.persistence.*;
 import kr.unideal.server.backend.domain.post.entity.Post;
 import kr.unideal.server.backend.domain.user.entity.User;
-import kr.unideal.server.backend.global.common.BaseTimeEntity;
+import kr.unideal.server.backend.global.entity.BaseTimeEntity;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -60,9 +60,12 @@ public class Comment extends BaseTimeEntity {
     }
 
     // 도메인 메서드
-    public void updateContent(String content) {
+    public void updateContent(String content, boolean secret) {
         this.content = content;
+        this.secret = secret;
     }
 
-
+    public void setSecret(boolean secret) {
+        this.secret = secret;
+    }
 }
