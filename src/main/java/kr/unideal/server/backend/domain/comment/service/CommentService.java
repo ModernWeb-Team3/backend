@@ -11,6 +11,7 @@ import kr.unideal.server.backend.domain.post.repository.PostRepository;
 import kr.unideal.server.backend.domain.user.entity.User;
 import kr.unideal.server.backend.domain.user.repository.UserRepository;
 import kr.unideal.server.backend.global.exception.CustomException;
+import kr.unideal.server.backend.global.exception.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,8 +51,9 @@ public class CommentService {
     @Transactional
     public void updateComment(Long userId, Long commentId, CommentUpdatedRequest request) {
         Comment comment = getAuthorizedComment(userId, commentId);
-        comment.updateContent(request.content());
+        comment.updateContent(request.content(),request.isPrivate());
     }
+
 
     // 댓글 삭제
     @Transactional
@@ -63,20 +65,36 @@ public class CommentService {
     // 대댓글 등록
     @Transactional
     public void registerReply(CommentRequest request, Long parentCommentId, Long userId) {
+        // 부모 댓글 조회
         Comment parentComment = commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+
+        // 부모 댓글의 게시글 가져오기
         Post post = parentComment.getPost();
+
+        // user 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        Comment reply = Comment.of(user, request.content(), post, parentComment);
+        // 대댓글 생성
+        Comment reply = Comment.builder()
+                .user(user)
+                .content(request.content())
+                .post(post)
+                .parent(parentComment)
+                .secret(request.isPrivate())  // secret 정보 반영
+                .build();
+
         commentRepository.save(reply);
     }
+
 
     // 대댓글 수정
     @Transactional
     public void updateReply(Long userId, Long commentId, CommentUpdatedRequest request) {
-        updateComment(userId, commentId, request); // 동일 로직
+        Comment comment = getAuthorizedComment(userId, commentId);
+        comment.updateContent(request.content(), request.isPrivate());
+
     }
 
     // 댓글 전체 조회
@@ -102,4 +120,32 @@ public class CommentService {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
     }
+
+    @Transactional
+    public void setCommentSecret(Long userId, Long commentId, boolean secret) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+
+        // 권한 체크 (작성자 본인인지 확인)
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.ACCESS_DENY);
+        }
+
+        comment.setSecret(secret);
+    }
+
+    @Transactional
+    public boolean toggleCommentSecret(Long userId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new CustomException(ACCESS_DENY);
+        }
+
+        boolean currentSecret = comment.isSecret();
+        comment.setSecret(!currentSecret); // 상태 반전
+        return !currentSecret; // 변경 후 상태 반환
+    }
+
 }
