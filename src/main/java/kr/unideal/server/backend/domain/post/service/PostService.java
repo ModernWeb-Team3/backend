@@ -1,12 +1,21 @@
 package kr.unideal.server.backend.domain.post.service;
 
+import kr.unideal.server.backend.domain.category.entity.Category;
+import kr.unideal.server.backend.domain.image.entity.Image;
+import kr.unideal.server.backend.domain.location.entity.Campus;
+import kr.unideal.server.backend.domain.post.controller.dto.request.ImageRequest;
 import kr.unideal.server.backend.domain.post.controller.dto.request.PostRequest;
 import kr.unideal.server.backend.domain.post.controller.dto.response.PostResponse;
 import kr.unideal.server.backend.domain.post.entity.Post;
 import kr.unideal.server.backend.domain.post.repository.PostRepository;
+import kr.unideal.server.backend.domain.user.entity.User;
+import kr.unideal.server.backend.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,25 +24,60 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserService userService;
 
     // post 생성
-    public void createPost(PostRequest request) {
+    public void createPost(PostRequest request, Long userId) {
+        Category category = Category.fromDescription(request.getCategory());
+        Campus location = Campus.fromDescription(request.getLocation());
+        User user = userService.loaduser(userId);
         Post post = Post.builder()
+                .user(user)
                 .name(request.getName())
                 .detail(request.getDetail())
+                .category(category)
                 .price(request.getPrice())
+                .location(location)
                 .status(request.getStatus())
                 .build();
-        postRepository.save(post);
+
+        for (ImageRequest imageReq : request.getImageList()) {
+            Image image = Image.builder()
+                    .url(imageReq.getUrl())
+                    .build();
+            post.addImage(image); // 연관관계 자동 설정
+        }
+
+
+
+        postRepository.save(post); // 이미지도 같이 저장됨       }
     }
 
-    // post 수정
-    public PostResponse updatePost(Long postId, PostRequest request) {
+    @Transactional
+    public PostResponse updatePost(Long userId, Long postId, PostRequest request) {
+        Category category = Category.fromDescription(request.getCategory());
+        Campus location = Campus.fromDescription(request.getLocation());
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. ID: " + postId));
-        post.updatePost(request.getName(), request.getDetail(), request.getPrice(), request.getStatus());
+
+        // 게시글 정보 업데이트
+        post.updatePost(request.getName(), request.getDetail(), request.getPrice(), request.getStatus(), category, location);
+
+        // 기존 이미지 제거
+        post.clearImages();
+
+        // 새로운 이미지 추가
+        for (ImageRequest imageReq : request.getImageList()) {
+            Image image = Image.builder()
+                    .url(imageReq.getUrl())
+                    .build();
+            post.addImage(image); // 연관관계 자동 설정
+        }
+
         return convertToResponse(postRepository.save(post));
     }
+
 
     // post 삭제
     public void deletePost(Long postId) {
@@ -44,8 +88,8 @@ public class PostService {
     }
 
     // 전체 post 목록 조회 -> 수정 필요
-    public List<PostResponse> getAllPosts() {
-        return postRepository.findByStatusAndCategoryOrderByCreatedAtDesc("노출", null)
+    public List<PostResponse> getAllPosts(Category category) {
+        return postRepository.findByCategoryAndStatus(category, "노출")
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -74,5 +118,18 @@ public class PostService {
                 .price(post.getPrice())
                 .status(post.getStatus())
                 .build();
+    }
+
+
+    public List<PostResponse> getPostsByCategory(String category) {
+        Category categoryToString = Category.fromDescription(category);
+
+        List<Post> posts = postRepository.findByCategoryAndStatus(categoryToString, "노출");
+        if (posts.isEmpty()) {
+            return new ArrayList<>(); // 빈 리스트 반환
+        }
+        return posts.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
     }
 }
