@@ -1,10 +1,11 @@
-package kr.unideal.server.backend.config.security;
+package kr.unideal.server.backend.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.unideal.server.backend.config.properties.Constants;
+import kr.unideal.server.backend.global.properties.Constants;
+import kr.unideal.server.backend.security.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

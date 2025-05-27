@@ -1,4 +1,4 @@
-package kr.unideal.server.backend.global.common;
+package kr.unideal.server.backend.global.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

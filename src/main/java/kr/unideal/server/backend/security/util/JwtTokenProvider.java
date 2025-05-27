@@ -1,4 +1,4 @@
-package kr.unideal.server.backend.config.security;
+package kr.unideal.server.backend.security.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -21,6 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import javax.crypto.SecretKey;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
@@ -28,20 +29,23 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     @Value("${jwt.token.secretKey}")
-    private String key;
-    private SecretKey secretKey;
+    private String key; // ✔️ 문자열로 주입
+    private final RedisUtil redisUtil;
+
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30L;
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60L * 24 * 7;
     private final UserRepository userRepository;
 
+    private SecretKey secretKey;
+
     @PostConstruct
     private void setSecretKey() {
-        if (key == null || key.length() < 32) {
-            throw new IllegalArgumentException("JWT 키가 너무 짧습니다. 최소 32바이트 이상이어야 합니다.");
+        if (key == null || key.isBlank()) {
+            throw new IllegalArgumentException("jwt.token.secretKey 값이 비어 있습니다.");
         }
-        secretKey = Keys.hmacShaKeyFor(key.getBytes());
+        byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(key);
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
-
 
     /// AccessToken 만들기
     public String generateAccessToken(Authentication authentication) {
@@ -50,11 +54,23 @@ public class JwtTokenProvider {
 
 
     /// Refresh token 발급
-    public void generateRefreshToken(Authentication authentication, String accessToken) {
+    public String generateRefreshToken(Authentication authentication) {
+        // 1) 인증 정보에서 사용자 ID 꺼내기
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getId();
+
+        // 2) 토큰 생성
         String refreshToken = generateToken(authentication, REFRESH_TOKEN_EXPIRE_TIME);
+
+        // 3) Redis에 userId를 키로 해서 저장
+        redisUtil.setRefreshToken(userId, refreshToken);
+
+        // 4) 생성된 토큰 반환
+        return refreshToken;
     }
 
-    ///
+
+    /// 토큰 생성
     public String generateToken(Authentication authentication, long expireTime) {
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + expireTime);
@@ -82,23 +98,35 @@ public class JwtTokenProvider {
     }
 
     ///
+
+
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
-        String rolesStr = claims.get("roles", String.class);
-        List<String> roles = Arrays.asList(rolesStr.split(","));
 
+        // 1) roles 클레임 읽기 (없으면 빈 문자열)
+        String rolesStr = claims.get("roles", String.class);
+
+        // 2) 빈 문자열은 필터링
+        List<String> roles = StringUtils.hasText(rolesStr)
+                ? Arrays.stream(rolesStr.split(","))
+                .filter(StringUtils::hasText)        // 빈 문자열 필터
+                .collect(Collectors.toList())
+                : Collections.emptyList();
+
+        // 3) SimpleGrantedAuthority 생성
         Collection<? extends GrantedAuthority> authorities = roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
+        // 4) userId 로 유저 조회
         Long userId = claims.get("userId", Long.class);
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AccessDeniedException("유효하지 않은 사용자 ID: " + userId));
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
         return new UsernamePasswordAuthenticationToken(userDetails, token, authorities);
     }
+
 
 
     public boolean validateToken(String token) {

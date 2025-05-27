@@ -1,5 +1,7 @@
-package kr.unideal.server.backend.config.security;
+package kr.unideal.server.backend.global.config;
 
+import kr.unideal.server.backend.security.filter.JwtAuthenticationFilter;
+import kr.unideal.server.backend.security.util.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,7 +22,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         (requests) -> requests
-                                .requestMatchers("/api/**", "/login", "/signup","/auth/login", "/auth/signup", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/api/**",
+                                "/auth/email", "/auth/validate", "/auth/signup", "/auth/login",
+                                        "/login", "/signup","/auth/login", "/auth/signup", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 // 권한제어부분은 필요 없어서 삭제
 //                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()

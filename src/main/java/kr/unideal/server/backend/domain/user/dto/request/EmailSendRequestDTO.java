@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Data
 @Getter
-public class EmailSendRequest {
+public class EmailSendRequestDTO {
 
     @Schema(description = "이메일", example = "example@gmail.com")
     private String email;
