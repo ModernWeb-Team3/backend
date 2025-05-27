@@ -27,4 +27,12 @@ public class VerificationCode {
     private String code;
 
     private LocalDateTime expiresTime;
+
+    public static VerificationCode of(String email, String code, LocalDateTime expiresTime) {
+        return VerificationCode.builder()
+                .email(email)
+                .code(code)
+                .expiresTime(expiresTime)
+                .build();
+    }
 }
