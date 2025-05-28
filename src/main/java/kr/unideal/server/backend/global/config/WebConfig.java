@@ -26,11 +26,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedOrigins("http://localhost:3000","https://api.unideal.kr")
+                .allowedMethods("GET", "POST","PATCH", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true) // 쿠키, 인증 포함 여부
-                .maxAge(3600); // preflight 캐시 시간 (초)
+                .allowCredentials(true)
+                .maxAge(3600);
     }
 
 

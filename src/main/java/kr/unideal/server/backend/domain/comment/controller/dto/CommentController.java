@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-//@RequestMapping("/posts")  // posts로 베이스 URI 통일
 public class CommentController {
 
     private final CommentService commentService;

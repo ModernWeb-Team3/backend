@@ -14,6 +14,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/*
+* http요청마다 jwt토큰 유효한지 검증하는 필터
+* 인증 정보 추출-> security context 관리
+* */
+
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -34,6 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // 요청헤더값읽기
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(Constants.AUTH_HEADER);
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(Constants.TOKEN_PREFIX)) {

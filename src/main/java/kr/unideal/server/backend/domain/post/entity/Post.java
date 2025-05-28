@@ -1,9 +1,7 @@
 package kr.unideal.server.backend.domain.post.entity;
 
 import jakarta.persistence.*;
-import kr.unideal.server.backend.domain.category.entity.Category;
 import kr.unideal.server.backend.domain.comment.entity.Comment;
-import kr.unideal.server.backend.domain.image.entity.Image;
 import kr.unideal.server.backend.domain.location.entity.Campus;
 import kr.unideal.server.backend.domain.user.entity.User;
 import kr.unideal.server.backend.global.entity.BaseTimeEntity;
@@ -32,7 +30,9 @@ public class Post extends BaseTimeEntity {
 
     private Integer price; // 가격
 
-    private String status; // 글 상태 (노출/숨김)
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false)
+    private Status status; // 판매 상태(판매중,판매완료)
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
@@ -46,20 +46,21 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> imageList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
 
-    public void updatePost(String name, String detail, Integer price, String status) {
+    public void updatePost(String name, String detail, Integer price, Status status) {
         this.name = name;
         this.detail = detail;
         this.price = price;
         this.status = status;
     }
 
-    public void updateStatus(String status) {
+    public void updateStatus(Status status) {
         this.status=status;
     }
 
@@ -75,7 +76,7 @@ public class Post extends BaseTimeEntity {
         image.setPost(this);
     }
 
-    public void updatePost(String name, String detail, Integer price, String status, Category category,Campus location) {
+    public void updatePost(String name, String detail, Integer price, Status status, Category category,Campus location) {
         this.name = name;
         this.detail = detail;
         this.price = price;

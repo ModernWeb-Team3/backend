@@ -1,8 +1,7 @@
-package kr.unideal.server.backend.domain.image.entity;
+package kr.unideal.server.backend.domain.post.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import kr.unideal.server.backend.domain.post.entity.Post;
 
 @Entity
 @Table(name = "image")
@@ -19,7 +18,7 @@ public class Image {
 
     private String url; // 이미지 저장된 경로 또는 URL
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post; // 이미지가 속한 게시글
 }

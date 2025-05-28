@@ -21,6 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import javax.crypto.SecretKey;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.springframework.util.StringUtils;
 
 @Slf4j
@@ -97,8 +98,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    ///
-
 
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
@@ -126,7 +125,6 @@ public class JwtTokenProvider {
         CustomUserDetails userDetails = new CustomUserDetails(user);
         return new UsernamePasswordAuthenticationToken(userDetails, token, authorities);
     }
-
 
 
     public boolean validateToken(String token) {

@@ -1,4 +1,4 @@
-package kr.unideal.server.backend.domain.category.entity;
+package kr.unideal.server.backend.domain.post.entity;
 
   import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Arrays;

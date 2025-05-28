@@ -9,8 +9,6 @@ import java.util.List;
 @Getter
 @Builder
 public class PostResponse {
-
-    private Long id;
     private String name;     // 상품명
     private String detail;   // 설명
     private Integer price;   // 가격

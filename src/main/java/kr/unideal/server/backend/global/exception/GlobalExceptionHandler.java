@@ -15,14 +15,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse<?> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.error("[예외 발생] EntityNotFoundException: {}", ex.getMessage());
         return ApiResponse.fail(new CustomException(ErrorCode.NOT_FOUND_END_POINT));
     }
 
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleIllegalStateException(Exception ex) {
-        log.error("[예외 발생] Exception: {}", ex.getMessage());
         return ApiResponse.fail(new CustomException(ErrorCode.BAD_REQUEST));
     }
 
@@ -30,7 +28,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<?> handleGeneralException(Exception ex) {
-        log.error("[예외 발생] Exception: {}", ex.getMessage());
         return ApiResponse.fail(new CustomException(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 

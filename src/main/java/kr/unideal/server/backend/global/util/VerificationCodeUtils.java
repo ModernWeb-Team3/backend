@@ -6,10 +6,8 @@ public class VerificationCodeUtils {
     static String verificationCodeCharacters = "0123456789";
     static int verificationCodeLength = 6;
 
+    // 난수 생성
     public static String generateVerificationCode() {
-        // use system-wide entropy to make sure that
-        // verification code can not be predicted via
-        // PRNG seed prediction
         SecureRandom random = new SecureRandom();
         StringBuilder builder = new StringBuilder();
 

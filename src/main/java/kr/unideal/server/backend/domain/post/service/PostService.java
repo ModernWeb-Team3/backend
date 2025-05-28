@@ -1,23 +1,27 @@
 package kr.unideal.server.backend.domain.post.service;
 
-import kr.unideal.server.backend.domain.category.entity.Category;
-import kr.unideal.server.backend.domain.image.entity.Image;
+import kr.unideal.server.backend.domain.comment.controller.dto.response.CommentResponse;
+import kr.unideal.server.backend.domain.post.entity.Category;
+import kr.unideal.server.backend.domain.post.entity.Image;
 import kr.unideal.server.backend.domain.location.entity.Campus;
 import kr.unideal.server.backend.domain.post.controller.dto.request.ImageRequest;
 import kr.unideal.server.backend.domain.post.controller.dto.request.PostRequest;
+import kr.unideal.server.backend.domain.post.controller.dto.response.PostListResponse;
 import kr.unideal.server.backend.domain.post.controller.dto.response.PostResponse;
 import kr.unideal.server.backend.domain.post.entity.Post;
+import kr.unideal.server.backend.domain.post.entity.Status;
 import kr.unideal.server.backend.domain.post.repository.PostRepository;
 import kr.unideal.server.backend.domain.user.entity.User;
 import kr.unideal.server.backend.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static kr.unideal.server.backend.domain.post.entity.Status.ON_SALE;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +34,7 @@ public class PostService {
     public void createPost(PostRequest request, Long userId) {
         Category category = Category.fromDescription(request.getCategory());
         Campus location = Campus.fromDescription(request.getLocation());
+        Status status = Status.fromDescription(request.getStatus());
         User user = userService.loaduser(userId);
         Post post = Post.builder()
                 .user(user)
@@ -38,7 +43,7 @@ public class PostService {
                 .category(category)
                 .price(request.getPrice())
                 .location(location)
-                .status(request.getStatus())
+                .status(status)
                 .build();
 
         for (ImageRequest imageReq : request.getImageList()) {
@@ -57,12 +62,13 @@ public class PostService {
     public PostResponse updatePost(Long userId, Long postId, PostRequest request) {
         Category category = Category.fromDescription(request.getCategory());
         Campus location = Campus.fromDescription(request.getLocation());
+        Status status = Status.fromDescription(request.getStatus());
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. ID: " + postId));
 
         // 게시글 정보 업데이트
-        post.updatePost(request.getName(), request.getDetail(), request.getPrice(), request.getStatus(), category, location);
+        post.updatePost(request.getName(), request.getDetail(), request.getPrice(), status, category, location);
 
         // 기존 이미지 제거
         post.clearImages();
@@ -87,14 +93,14 @@ public class PostService {
         postRepository.deleteById(postId);
     }
 
-    // 전체 post 목록 조회 -> 수정 필요
-    public List<PostResponse> getAllPosts(Category category) {
-        return postRepository.findByCategoryAndStatus(category, "노출")
-                .stream()
-                .map(this::convertToResponse)
+    // 전체 post 목록 조회
+    public List<PostListResponse> getAllPostList() {
+        List<Post> posts = postRepository.findAllPostsByStatus(ON_SALE);
+
+        return posts.stream()
+                .map(PostListResponse::of)
                 .collect(Collectors.toList());
     }
-
     // 특정 post 상세 조회
     public PostResponse getPost(Long postId) {
         Post post = postRepository.findById(postId)
@@ -103,28 +109,35 @@ public class PostService {
     }
 
     // 게시글 상태(status) 변경
-    public PostResponse updateStatus(Long postId, String status) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. ID: " + postId));
-        post.updateStatus(status);
-        return convertToResponse(postRepository.save(post));
-    }
+//    public PostResponse updateStatus(Long postId, Status status) {
+//        Post post = postRepository.findById(postId)
+//                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. ID: " + postId));
+//        post.updateStatus(status);
+//        return convertToResponse(postRepository.save(post));
+//    }
 
     private PostResponse convertToResponse(Post post) {
+        List<CommentResponse> commentResponses = post.getCommentList().stream()
+                .map(comment -> CommentResponse.from(comment, post.getUser().getName()))
+                .collect(Collectors.toList());
+
         return PostResponse.builder()
-                .id(post.getId())
                 .name(post.getName())
                 .detail(post.getDetail())
                 .price(post.getPrice())
-                .status(post.getStatus())
+                .status(post.getStatus().toString())
+                .category(post.getCategory().getDescription())
+                .location(post.getLocation().getDescription())
+                .comments(commentResponses)
                 .build();
     }
+
 
 
     public List<PostResponse> getPostsByCategory(String category) {
         Category categoryToString = Category.fromDescription(category);
 
-        List<Post> posts = postRepository.findByCategoryAndStatus(categoryToString, "노출");
+        List<Post> posts = postRepository.findByCategoryAndStatus(categoryToString, ON_SALE);
         if (posts.isEmpty()) {
             return new ArrayList<>(); // 빈 리스트 반환
         }
@@ -132,4 +145,5 @@ public class PostService {
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
+
 }

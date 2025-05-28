@@ -22,11 +22,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         (requests) -> requests
-                                .requestMatchers("/api/**",
-                                "/auth/email", "/auth/validate", "/auth/signup", "/auth/login",
-                                        "/login", "/signup","/auth/login", "/auth/signup", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                                // 권한제어부분은 필요 없어서 삭제
-//                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers(
+                                        "/auth/email", "/auth/validate", "/auth/signup", "/auth/login",
+                                        "/swagger-ui/**", "/v3/api-docs/**").permitAll() // 위 경로들은 인증 없이 접근 허용
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())

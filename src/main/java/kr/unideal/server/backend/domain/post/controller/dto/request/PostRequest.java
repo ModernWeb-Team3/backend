@@ -1,6 +1,5 @@
 package kr.unideal.server.backend.domain.post.controller.dto.request;
 
-import kr.unideal.server.backend.domain.image.entity.Image;
 import lombok.Getter;
 
 import java.util.List;

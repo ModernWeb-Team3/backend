@@ -1,8 +1,9 @@
 package kr.unideal.server.backend.domain.post.controller.dto;
 
-import kr.unideal.server.backend.domain.category.entity.Category;
 import kr.unideal.server.backend.domain.post.controller.dto.request.PostRequest;
+import kr.unideal.server.backend.domain.post.controller.dto.response.PostListResponse;
 import kr.unideal.server.backend.domain.post.controller.dto.response.PostResponse;
+import kr.unideal.server.backend.domain.post.entity.Status;
 import kr.unideal.server.backend.domain.post.service.PostService;
 import kr.unideal.server.backend.domain.user.aop.CurrentUserId;
 import kr.unideal.server.backend.global.response.ApiResponse;
@@ -41,11 +42,11 @@ public class PostController {
     }
 
     // 전체 게시글 목록을 조회
-//    @GetMapping
-//    public ApiResponse<List<PostResponse>> getAllPosts(@RequestParam Category category) {
-//        List<PostResponse> posts = postService.getAllPosts(category);
-//        return ApiResponse.ok(posts);
-//    }
+    @GetMapping("/all")
+    public ApiResponse<List<PostListResponse>> getAllPosts() {
+        List<PostListResponse> posts = postService.getAllPostList();
+        return ApiResponse.ok(posts);
+    }
 
     // 특정 게시글의 상세 정보를 조회
     @GetMapping("/{postId}")
@@ -57,11 +58,11 @@ public class PostController {
 
 
     // 게시글의 상태(status)를 변경
-    @PatchMapping("/{postId}/status")
-    public ApiResponse<PostResponse> updateStatus(@PathVariable Long postId, @RequestBody String status) {
-        PostResponse response = postService.updateStatus(postId, status);
-        return ApiResponse.ok(response);
-    }
+//    @PatchMapping("/{postId}/status")
+//    public ApiResponse<PostResponse> updateStatus(@PathVariable Long postId, @RequestBody Status status) {
+//        PostResponse response = postService.updateStatus(postId, status);
+//        return ApiResponse.ok(response);
+//    }
 
     //카테고리별 게시글 조회
     @GetMapping
