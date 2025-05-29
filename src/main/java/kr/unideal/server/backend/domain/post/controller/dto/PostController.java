@@ -3,7 +3,6 @@ package kr.unideal.server.backend.domain.post.controller.dto;
 import kr.unideal.server.backend.domain.post.controller.dto.request.PostRequest;
 import kr.unideal.server.backend.domain.post.controller.dto.response.PostListResponse;
 import kr.unideal.server.backend.domain.post.controller.dto.response.PostResponse;
-import kr.unideal.server.backend.domain.post.entity.Status;
 import kr.unideal.server.backend.domain.post.service.PostService;
 import kr.unideal.server.backend.domain.user.aop.CurrentUserId;
 import kr.unideal.server.backend.global.response.ApiResponse;
@@ -57,19 +56,14 @@ public class PostController {
     }
 
 
-    // 게시글의 상태(status)를 변경
-//    @PatchMapping("/{postId}/status")
-//    public ApiResponse<PostResponse> updateStatus(@PathVariable Long postId, @RequestBody Status status) {
-//        PostResponse response = postService.updateStatus(postId, status);
-//        return ApiResponse.ok(response);
-//    }
-
     //카테고리별 게시글 조회
     @GetMapping
     public ApiResponse<List<PostResponse>> getPostsByCategory(@RequestParam String category) {
         List<PostResponse> posts = postService.getPostsByCategory(category);
         return ApiResponse.ok(posts);
     }
+
+    // 검색
 
 
 }

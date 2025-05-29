@@ -15,6 +15,7 @@ public class PostResponse {
     private String status;   // 상태 (노출/숨김)
     private String category;
     private String location;
-    private List<CommentResponse> comments;
+    private String userName; // 작성자 이름
+    private List<ImageResponse> imageList; // 이미지 리스트
 
 }

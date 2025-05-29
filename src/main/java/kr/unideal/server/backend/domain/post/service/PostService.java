@@ -1,6 +1,6 @@
 package kr.unideal.server.backend.domain.post.service;
 
-import kr.unideal.server.backend.domain.comment.controller.dto.response.CommentResponse;
+import kr.unideal.server.backend.domain.post.controller.dto.response.ImageResponse;
 import kr.unideal.server.backend.domain.post.entity.Category;
 import kr.unideal.server.backend.domain.post.entity.Image;
 import kr.unideal.server.backend.domain.location.entity.Campus;
@@ -108,19 +108,8 @@ public class PostService {
         return convertToResponse(post);
     }
 
-    // 게시글 상태(status) 변경
-//    public PostResponse updateStatus(Long postId, Status status) {
-//        Post post = postRepository.findById(postId)
-//                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. ID: " + postId));
-//        post.updateStatus(status);
-//        return convertToResponse(postRepository.save(post));
-//    }
 
     private PostResponse convertToResponse(Post post) {
-        List<CommentResponse> commentResponses = post.getCommentList().stream()
-                .map(comment -> CommentResponse.from(comment, post.getUser().getName()))
-                .collect(Collectors.toList());
-
         return PostResponse.builder()
                 .name(post.getName())
                 .detail(post.getDetail())
@@ -128,7 +117,12 @@ public class PostService {
                 .status(post.getStatus().toString())
                 .category(post.getCategory().getDescription())
                 .location(post.getLocation().getDescription())
-                .comments(commentResponses)
+                .userName(post.getUser().getName())
+                .imageList(post.getImageList().stream()
+                        .map(image -> ImageResponse.builder()
+                                .url(image.getUrl())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 
