@@ -30,9 +30,9 @@ public class CookieUtil {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken) // name, value 순서
                 .maxAge(cookieMaxAge)
                 .path(cookiePathOption)
-                .secure(false) // HTTPS 사용 시 true
+                .secure(true)
                 .httpOnly(true)
-                .sameSite("None") // 개발 환경에서는 "Lax" 또는 "Strict"도 가능
+                .sameSite("None")
                 .build();
 
         response.setHeader("Set-Cookie", cookie.toString());
@@ -60,7 +60,7 @@ public class CookieUtil {
         ResponseCookie cookie = ResponseCookie.from(String.valueOf(userId), "value")
                 .maxAge(0) // 즉시만료
                 .path("/")
-                .secure(false)
+                .secure(true)
                 .httpOnly(true)
                 .sameSite("None")
                 .build();

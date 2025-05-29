@@ -51,7 +51,6 @@ public class PostController {
     @GetMapping("/{postId}")
     public ApiResponse<PostResponse> getPost(@PathVariable Long postId) {
         PostResponse response = postService.getPost(postId);
-
         return ApiResponse.ok(response);
     }
 

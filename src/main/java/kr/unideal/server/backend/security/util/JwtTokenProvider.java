@@ -22,8 +22,6 @@ import javax.crypto.SecretKey;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.springframework.util.StringUtils;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -33,7 +31,7 @@ public class JwtTokenProvider {
     private String key; // ✔️ 문자열로 주입
     private final RedisUtil redisUtil;
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30*30L;
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30 * 30L;
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60L * 24 * 7;
     private final UserRepository userRepository;
 
@@ -48,7 +46,7 @@ public class JwtTokenProvider {
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    /// AccessToken 만들기
+    /// AccessToken 생성
     public String generateAccessToken(Authentication authentication) {
         return generateToken(authentication, ACCESS_TOKEN_EXPIRE_TIME);
     }
@@ -80,7 +78,6 @@ public class JwtTokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        // roles를 단일 문자열로 저장
         String roles = String.join(",", authorities);
 
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -149,17 +146,14 @@ public class JwtTokenProvider {
     /// 토큰 Parse 하기
     private Claims parseClaims(String token) {
         try {
-            // JWT 파서를 빌드하고 서명된 토큰을 파싱
             return Jwts.parserBuilder()
-                    .setSigningKey(secretKey)  // 서명 키를 설정
+                    .setSigningKey(secretKey)
                     .build()
-                    .parseClaimsJws(token)  // 서명된 JWT 토큰을 파싱
-                    .getBody();  // Claims 객체 반환
+                    .parseClaimsJws(token)
+                    .getBody();
         } catch (ExpiredJwtException e) {
-            // 만료된 JWT 토큰의 경우 만료된 Claims 반환
             return e.getClaims();
         } catch (MalformedJwtException e) {
-            // 잘못된 JWT 토큰 형식일 경우 예외 처리
             throw new CustomJWTException("잘못된 토큰 형식입니다.");
         }
     }

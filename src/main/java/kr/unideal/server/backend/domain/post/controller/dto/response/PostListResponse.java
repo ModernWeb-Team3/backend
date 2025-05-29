@@ -6,7 +6,6 @@ import lombok.Builder;
 @Builder
 public record PostListResponse(
 
-
         String thumbnail, // 썸네일 이미지 URL
         String name,     // 상품명
         String location,

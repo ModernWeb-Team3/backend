@@ -89,14 +89,6 @@ public class CommentService {
     }
 
 
-    // 대댓글 수정
-    @Transactional
-    public void updateReply(Long userId, Long commentId, CommentUpdatedRequest request) {
-        Comment comment = getAuthorizedComment(userId, commentId);
-        comment.updateContent(request.content(), request.isPrivate());
-
-    }
-
     // 특정 게시글의 댓글 조회
     public List<CommentResponse> getComments(Long postId) {
         List<CommentResponse> comments = getAllCommentsByPostId(postId);
@@ -130,21 +122,9 @@ public class CommentService {
                 .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
     }
 
+    // 상태 변경
     @Transactional
-    public void setCommentSecret(Long userId, Long commentId, boolean secret) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
-
-        // 권한 체크 (작성자 본인인지 확인)
-        if (!comment.getUser().getId().equals(userId)) {
-            throw new CustomException(ErrorCode.ACCESS_DENY);
-        }
-
-        comment.setSecret(secret);
-    }
-
-    @Transactional
-    public boolean toggleCommentSecret(Long userId, Long commentId) {
+    public boolean setCommentSecret(Long userId, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
 

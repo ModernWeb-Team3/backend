@@ -18,10 +18,6 @@ public enum Status {
 
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     @JsonCreator
     public static Status fromDescription(String desc) {
         String cleaned = desc.trim().replaceAll("^\"|\"$", "");

@@ -52,18 +52,9 @@ public class Post extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
-
-    public void updatePost(String name, String detail, Integer price, Status status) {
-        this.name = name;
-        this.detail = detail;
-        this.price = price;
-        this.status = status;
-    }
-
-    public void updateStatus(Status status) {
-        this.status=status;
-    }
-
+    
+    
+    // 도메인 메서드
     public void clearImages() {
         for (Image image : imageList) {
             image.setPost(null); // 연관관계 제거
@@ -76,7 +67,7 @@ public class Post extends BaseTimeEntity {
         image.setPost(this);
     }
 
-    public void updatePost(String name, String detail, Integer price, Status status, Category category,Campus location) {
+    public void updatePost(String name, String detail, Integer price, Status status, Category category, Campus location) {
         this.name = name;
         this.detail = detail;
         this.price = price;

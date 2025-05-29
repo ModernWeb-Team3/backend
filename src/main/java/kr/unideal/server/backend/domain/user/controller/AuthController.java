@@ -18,7 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import static kr.unideal.server.backend.global.properties.Constants.AUTH_HEADER;
-import static kr.unideal.server.backend.global.properties.Constants.REFRESH_TOKEN_SUBJECT;
 
 @RestController
 @RequiredArgsConstructor
@@ -73,7 +72,7 @@ public class AuthController {
     @PostMapping("/auth/login")
     public ApiResponse<String> login(
             @RequestBody LogInRequestDTO logInRequestDTO,
-            BindingResult bindingResult,HttpServletResponse response
+            BindingResult bindingResult, HttpServletResponse response
 
     ) {
         if (bindingResult.hasErrors()) {
@@ -81,8 +80,8 @@ public class AuthController {
         }
 
 
-        LogInResponseDTO user = userService.login(logInRequestDTO,response);
-        addAccessTokenHeader(user.getJwtToken(),response);
+        LogInResponseDTO user = userService.login(logInRequestDTO, response);
+        addAccessTokenHeader(user.getJwtToken(), response);
         return ApiResponse.ok("로그인이 성공적으로 완료되었습니다.");
 
 
@@ -106,7 +105,7 @@ public class AuthController {
 
     // refresh 토큰으로 accessToken, refreshToken을 재발급
     @PostMapping("/auth/reissue")
-    public ApiResponse<String> reissue(HttpServletRequest request,HttpServletResponse response) {
+    public ApiResponse<String> reissue(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = userService.reissue(request, response);
         addAccessTokenHeader(accessToken, response);
         return ApiResponse.ok("성공적으로 재발급되었습니다.");
