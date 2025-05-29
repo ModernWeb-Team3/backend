@@ -49,6 +49,7 @@ public class UserService {
 
     //회원가입 db 등록 method
     public void register(SignUpRequestDTO dto) {
+
         if (!validatorService.isGachonUnivStudent(dto.getEmail())) {
             throw new IllegalArgumentException("가천대학교 학생 이메일이 아닙니다.");
         }
@@ -136,10 +137,15 @@ public class UserService {
         }
     }
 
-    // 재발급
+    //회원 탈퇴
+    public void deleteuser(Long id) {
+
+    }
+
     public String reissue(HttpServletRequest request, HttpServletResponse response) {
         //  1. 쿠키에서 Refresh Token 꺼내기
         String refreshToken = cookieUtil.getRefreshTokenFromCookies(request);
+        log.info("▶ 클라이언트 요청 Refresh Token: {}", refreshToken);
 
         // 2. Refresh Token 유효성 검증
         if (!tokenProvider.validateToken(refreshToken)) {
@@ -151,6 +157,7 @@ public class UserService {
 
         // 4. Redis에서 저장된 Refresh Token 조회
         String storedRefreshToken = (String) redisUtil.getRefreshToken(userId);
+        log.info("▶ Redis 저장 Refresh Token: {}", storedRefreshToken);
 
         //  5. 일치 여부 확인
         if (!refreshToken.equals(storedRefreshToken)) {
@@ -171,13 +178,17 @@ public class UserService {
         //  9. 새 Refresh Token 쿠키에 저장
         setRefreshTokenCookie(newRefreshToken, response);
 
+        //  10. 로그 출력
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        log.info("🔄 Refresh Token 재발급 완료 - userId: {}", userDetails.getId());
 
         return newAccessToken;
     }
 
-    // 쿠키에 RefreshToken 설정
+    // 쿠키에 RefreshToken 설정 (HttpServletResponse 필요)
     public void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {
         cookieUtil.setCookie(refreshToken, response);
+        log.info("🍪 쿠키에 RefreshToken 저장 완료 - key: {}", refreshToken);
     }
 
 
