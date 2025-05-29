@@ -97,6 +97,15 @@ public class CommentService {
 
     }
 
+    // 특정 게시글의 댓글 조회
+    public List<CommentResponse> getComments(Long postId) {
+        List<CommentResponse> comments = getAllCommentsByPostId(postId);
+        if (comments.isEmpty()) {
+            throw new CustomException(COMMENT_NOT_FOUND);
+        }
+        return comments;
+    }
+
     // 댓글 전체 조회
     @Transactional(readOnly = true)
     public List<CommentResponse> getAllCommentsByPostId(Long postId) {
@@ -147,5 +156,6 @@ public class CommentService {
         comment.setSecret(!currentSecret); // 상태 반전
         return !currentSecret; // 변경 후 상태 반환
     }
+
 
 }

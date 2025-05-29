@@ -32,6 +32,13 @@ public class CommentController {
         return ApiResponse.ok("대댓글이 등록되었습니다.");
     }
 
+    // 특정 게시글의 댓글 목록을 조회
+    @GetMapping("/{postId}/comments")
+    public ApiResponse<?> getComments(@PathVariable Long postId) {
+        return ApiResponse.ok(commentService.getComments(postId));
+    }
+
+
     // 비밀글 토글
     @PatchMapping("/comments/{commentId}/private")
     public ApiResponse<String> toggleCommentPrivate(@CurrentUserId Long userId,
