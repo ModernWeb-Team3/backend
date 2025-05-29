@@ -140,4 +140,14 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    // 검색
+    public List<PostListResponse> searchPosts(String keyword) {
+        List<Post> posts = postRepository.findByNameContainingAndStatus(keyword, ON_SALE);
+        if (posts.isEmpty()) {
+            return new ArrayList<>(); // 빈 리스트 반환
+        }
+        return posts.stream()
+                .map(PostListResponse::of)
+                .collect(Collectors.toList());
+    }
 }

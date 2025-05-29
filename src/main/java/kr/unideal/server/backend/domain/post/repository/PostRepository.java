@@ -17,4 +17,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE p.status = :status ORDER BY p.createdAt DESC")
     List<Post> findAllPostsByStatus(@Param("status") Status status);
 
+    @Query("SELECT p FROM Post p WHERE p.name LIKE %:keyword% AND p.status = :status ORDER BY p.createdAt DESC")
+    List<Post> findByNameContainingAndStatus(String keyword, Status status);
 }

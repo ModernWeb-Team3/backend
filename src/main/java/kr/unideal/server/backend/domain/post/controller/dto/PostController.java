@@ -64,6 +64,11 @@ public class PostController {
     }
 
     // 검색
+    @GetMapping("/search")
+    public ApiResponse<List<PostListResponse>> searchPosts(@RequestParam String keyword) {
+        List<PostListResponse> posts = postService.searchPosts(keyword);
+        return ApiResponse.ok(posts);
+    }
 
 
 }
