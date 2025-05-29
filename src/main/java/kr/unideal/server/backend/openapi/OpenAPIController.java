@@ -12,7 +12,7 @@ public class OpenAPIController {
     @Value("${springdoc.api-docs.path}")
     private String openApiUrl;
 
-    @GetMapping("/docs")
+    @GetMapping("/swagger-ui")
     @Hidden
     public String apiSpec(Model model) {
         model.addAttribute("openApiUrl", openApiUrl);
