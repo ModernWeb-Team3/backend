@@ -164,4 +164,20 @@ public class JwtTokenProvider {
         }
     }
 
+    public Long getUserIdFromToken(String refreshToken) {
+        if (!StringUtils.hasText(refreshToken)) {
+            throw new CustomJWTException("토큰이 비어있습니다.");
+        }
+
+        try {
+            Claims claims = parseClaims(refreshToken);
+            return claims.get("userId", Long.class);
+        } catch (ExpiredJwtException e) {
+            throw new CustomJWTException("토큰이 만료되었습니다.");
+        } catch (MalformedJwtException e) {
+            throw new CustomJWTException("잘못된 토큰 형식입니다.");
+        } catch (Exception e) {
+            throw new CustomJWTException("토큰 검증에 실패했습니다.");
+        }
+    }
 }

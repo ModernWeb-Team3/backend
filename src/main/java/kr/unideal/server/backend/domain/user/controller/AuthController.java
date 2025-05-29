@@ -1,5 +1,6 @@
 package kr.unideal.server.backend.domain.user.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.unideal.server.backend.global.util.VerificationCodeUtils;
 import kr.unideal.server.backend.domain.user.dto.CustomUserDetails;
@@ -105,8 +106,8 @@ public class AuthController {
 
     // refresh 토큰으로 accessToken, refreshToken을 재발급
     @PostMapping("/auth/reissue")
-    public ApiResponse<String> reissue(@RequestHeader(REFRESH_TOKEN_SUBJECT) String refreshToken, HttpServletResponse response) {
-        String accessToken = userService.reissue(refreshToken, response);
+    public ApiResponse<String> reissue(HttpServletRequest request,HttpServletResponse response) {
+        String accessToken = userService.reissue(request, response);
         addAccessTokenHeader(accessToken, response);
         return ApiResponse.ok("성공적으로 재발급되었습니다.");
     }

@@ -1,7 +1,10 @@
 package kr.unideal.server.backend.domain.user.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.unideal.server.backend.global.exception.CustomException;
+import kr.unideal.server.backend.global.exception.ErrorCode;
 import kr.unideal.server.backend.security.util.CookieUtil;
 import kr.unideal.server.backend.security.util.JwtTokenProvider;
 import kr.unideal.server.backend.domain.user.dto.CustomUserDetails;
@@ -15,6 +18,7 @@ import kr.unideal.server.backend.domain.user.repository.EmailRepository;
 import kr.unideal.server.backend.domain.user.repository.UserRepository;
 
 
+import kr.unideal.server.backend.security.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -41,7 +45,7 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final EmailRepository emailRepository;
     private final JwtTokenProvider jwtTokenProvider;
-
+    private final RedisUtil redisUtil;
 
     //회원가입 db 등록 method
     public void register(SignUpRequestDTO dto) {
@@ -77,7 +81,7 @@ public class UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = tokenProvider.generateAccessToken(authentication);
-        String refreshToken=tokenProvider.generateRefreshToken(authentication);
+        String refreshToken = tokenProvider.generateRefreshToken(authentication);
 
         setRefreshTokenCookie(refreshToken, response);
 
@@ -116,14 +120,6 @@ public class UserService {
     }
 
 
-    // 인증토큰 발급
-//    public void issueVerificationCode(User user) {
-//        String verificationCode = VerificationCodeUtils.generateVerificationCode();
-//
-//        user.setVerificationToken(verificationCode);
-//        mailService.sendVerificationCode(user.getEmail(), verificationCode);
-//    }
-
     // 로그아웃
     public void logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -145,26 +141,46 @@ public class UserService {
     public void deleteuser(Long id) {
     }
 
-    /// refreshToken 재발급
-    public String reissue(String refreshToken, HttpServletResponse response) {
+    public String reissue(HttpServletRequest request, HttpServletResponse response) {
+        //  1. 쿠키에서 Refresh Token 꺼내기
+        String refreshToken = cookieUtil.getRefreshTokenFromCookies(request);
+        log.info("▶ 클라이언트 요청 Refresh Token: {}", refreshToken);
+
+        // 2. Refresh Token 유효성 검증
         if (!tokenProvider.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
+            throw new CustomException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
 
-        // Refresh Token에서 사용자 정보 추출
+        // 3. Refresh Token에서 userId 추출
+        Long userId = tokenProvider.getUserIdFromToken(refreshToken);
+
+        // 4. Redis에서 저장된 Refresh Token 조회
+        String storedRefreshToken = (String) redisUtil.getRefreshToken(userId);
+        log.info("▶ Redis 저장 Refresh Token: {}", storedRefreshToken);
+
+        //  5. 일치 여부 확인
+        if (!refreshToken.equals(storedRefreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        //  6. 인증 정보 생성
         Authentication authentication = tokenProvider.getAuthentication(refreshToken);
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        // 새로운 Access Token 발급
+        //  7. 새로운 토큰 발급
         String newAccessToken = tokenProvider.generateAccessToken(authentication);
-
-        // 새로운 Refresh Token 발급
         String newRefreshToken = tokenProvider.generateRefreshToken(authentication);
 
-        // 쿠키에 새로 발급한 Refresh Token 설정
+        //  8. Redis 갱신
+        redisUtil.deleteRefreshToken(userId);
+        redisUtil.setRefreshToken(userId, newRefreshToken);
+
+        //  9. 새 Refresh Token 쿠키에 저장
         setRefreshTokenCookie(newRefreshToken, response);
 
+        //  10. 로그 출력
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         log.info("🔄 Refresh Token 재발급 완료 - userId: {}", userDetails.getId());
+
         return newAccessToken;
     }
 

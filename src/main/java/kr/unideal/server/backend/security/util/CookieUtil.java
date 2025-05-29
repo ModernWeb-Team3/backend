@@ -26,25 +26,33 @@ public class CookieUtil {
     private String cookiePathOption;
 
     // 쿠키 설정
-    public void setCookie(String userId, HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from(userId)
+    public void setCookie(String refreshToken, HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken) // name, value 순서
                 .maxAge(cookieMaxAge)
                 .path(cookiePathOption)
-                .secure(secureOption) //https 적용 시 true
+                .secure(false) // HTTPS 사용 시 true
                 .httpOnly(true)
-                .sameSite("None")
+                .sameSite("None") // 개발 환경에서는 "Lax" 또는 "Strict"도 가능
                 .build();
+
         response.setHeader("Set-Cookie", cookie.toString());
     }
 
-    // 쿠키 가져오기
-    private static Cookie[] getCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
 
+    // 쿠키 가져오기
+    public String getRefreshTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND_IN_COOKIE);
+            throw new CustomException(ErrorCode.TOKEN_NOT_FOUND);
         }
-        return cookies;
+
+        for (Cookie cookie : cookies) {
+            if ("refreshToken".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+
+        throw new CustomException(ErrorCode.TOKEN_NOT_FOUND); // refreshToken 쿠키가 없을 경우
     }
 
     // 쿠키 삭제
@@ -52,7 +60,7 @@ public class CookieUtil {
         ResponseCookie cookie = ResponseCookie.from(String.valueOf(userId), "value")
                 .maxAge(0) // 즉시만료
                 .path("/")
-                .secure(true)
+                .secure(false)
                 .httpOnly(true)
                 .sameSite("None")
                 .build();
