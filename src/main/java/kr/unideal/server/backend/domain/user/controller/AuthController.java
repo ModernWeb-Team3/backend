@@ -1,5 +1,6 @@
 package kr.unideal.server.backend.domain.user.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.unideal.server.backend.global.util.VerificationCodeUtils;
 import kr.unideal.server.backend.domain.user.dto.CustomUserDetails;
@@ -17,7 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import static kr.unideal.server.backend.global.properties.Constants.AUTH_HEADER;
-import static kr.unideal.server.backend.global.properties.Constants.REFRESH_TOKEN_SUBJECT;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,24 +70,25 @@ public class AuthController {
 
     // 로그인
     @PostMapping("/auth/login")
-    public ApiResponse<LogInResponseDTO> login(
+    public ApiResponse<String> login(
             @RequestBody LogInRequestDTO logInRequestDTO,
-            BindingResult bindingResult,HttpServletResponse response
+            BindingResult bindingResult, HttpServletResponse response
+
     ) {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException("입력값 규격이 올바르지 않습니다.");
         }
 
 
-        LogInResponseDTO user = userService.login(logInRequestDTO);
-        addAccessTokenHeader(user.getJwtToken(),response);
-        return ApiResponse.ok(user);
+        LogInResponseDTO user = userService.login(logInRequestDTO, response);
+        addAccessTokenHeader(user.getJwtToken(), response);
+        return ApiResponse.ok("로그인이 성공적으로 완료되었습니다.");
 
 
     }
 
     //로그아웃
-    @PostMapping("/logout")
+    @PostMapping("/auth/logout")
     public ApiResponse<String> logout() {
         userService.logout();
         return ApiResponse.ok("성공적으로 로그아웃 되었습니다.");
@@ -103,9 +104,9 @@ public class AuthController {
 
 
     // refresh 토큰으로 accessToken, refreshToken을 재발급
-    @PostMapping("/reissue")
-    public ApiResponse<String> reissue(@RequestHeader(REFRESH_TOKEN_SUBJECT) String refreshToken, HttpServletResponse response) {
-        String accessToken = userService.reissue(refreshToken, response);
+    @PostMapping("/auth/reissue")
+    public ApiResponse<String> reissue(HttpServletRequest request, HttpServletResponse response) {
+        String accessToken = userService.reissue(request, response);
         addAccessTokenHeader(accessToken, response);
         return ApiResponse.ok("성공적으로 재발급되었습니다.");
     }

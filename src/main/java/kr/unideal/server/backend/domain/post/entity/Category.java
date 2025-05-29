@@ -22,11 +22,6 @@ public enum Category {
         return description;
     }
 
-    /**
-     * 한글 설명으로 Category 찾기
-     * JSON 직렬화 시 클라이언트로 "책", "의류" 등 description을 주고,
-     * 다시 받았을 때 이 메서드가 매핑해 줍니다.
-     */
     @JsonCreator
     public static Category fromDescription(String desc) {
         String cleaned = desc.trim().replaceAll("^\"|\"$", "");

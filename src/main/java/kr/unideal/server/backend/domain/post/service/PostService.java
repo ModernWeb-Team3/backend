@@ -52,10 +52,7 @@ public class PostService {
                     .build();
             post.addImage(image); // 연관관계 자동 설정
         }
-
-
-
-        postRepository.save(post); // 이미지도 같이 저장됨       }
+        postRepository.save(post); // 이미지도 같이 저장됨
     }
 
     @Transactional
@@ -96,11 +93,11 @@ public class PostService {
     // 전체 post 목록 조회
     public List<PostListResponse> getAllPostList() {
         List<Post> posts = postRepository.findAllPostsByStatus(ON_SALE);
-
         return posts.stream()
                 .map(PostListResponse::of)
                 .collect(Collectors.toList());
     }
+
     // 특정 post 상세 조회
     public PostResponse getPost(Long postId) {
         Post post = postRepository.findById(postId)
@@ -108,7 +105,31 @@ public class PostService {
         return convertToResponse(post);
     }
 
+    public List<PostResponse> getPostsByCategory(String category) {
+        Category categoryToString = Category.fromDescription(category);
 
+        List<Post> posts = postRepository.findByCategoryAndStatus(categoryToString, ON_SALE);
+        if (posts.isEmpty()) {
+            return new ArrayList<>(); // 빈 리스트 반환
+        }
+        return posts.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // 검색
+    public List<PostListResponse> searchPosts(String keyword) {
+        List<Post> posts = postRepository.findByNameContainingAndStatus(keyword, ON_SALE);
+        if (posts.isEmpty()) {
+            return new ArrayList<>(); // 빈 리스트 반환
+        }
+        return posts.stream()
+                .map(PostListResponse::of)
+                .collect(Collectors.toList());
+    }
+
+
+    // 게시글 응답 변환
     private PostResponse convertToResponse(Post post) {
         return PostResponse.builder()
                 .name(post.getName())
@@ -126,18 +147,5 @@ public class PostService {
                 .build();
     }
 
-
-
-    public List<PostResponse> getPostsByCategory(String category) {
-        Category categoryToString = Category.fromDescription(category);
-
-        List<Post> posts = postRepository.findByCategoryAndStatus(categoryToString, ON_SALE);
-        if (posts.isEmpty()) {
-            return new ArrayList<>(); // 빈 리스트 반환
-        }
-        return posts.stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
-    }
 
 }

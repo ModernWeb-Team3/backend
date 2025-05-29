@@ -16,9 +16,9 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String url; // 이미지 저장된 경로 또는 URL
+    private String url;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private Post post; // 이미지가 속한 게시글
+    private Post post;
 }

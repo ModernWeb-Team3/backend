@@ -1,6 +1,5 @@
 package kr.unideal.server.backend.domain.post.controller.dto.response;
 
-import kr.unideal.server.backend.domain.comment.controller.dto.response.CommentResponse;
 import lombok.Builder;
 import lombok.Getter;
 

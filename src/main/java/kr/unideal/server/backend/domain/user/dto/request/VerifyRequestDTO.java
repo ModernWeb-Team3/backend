@@ -5,16 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 public class VerifyRequestDTO {
-    @Getter
-    @Setter
 
     @NotBlank
     @Email
     String email;
 
-    @Getter
-    @Setter
     @NotBlank
     String code;
 }

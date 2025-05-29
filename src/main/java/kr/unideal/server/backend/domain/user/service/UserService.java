@@ -1,7 +1,11 @@
 package kr.unideal.server.backend.domain.user.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.unideal.server.backend.global.exception.CustomException;
+import kr.unideal.server.backend.global.exception.ErrorCode;
+import kr.unideal.server.backend.security.util.CookieUtil;
 import kr.unideal.server.backend.security.util.JwtTokenProvider;
 import kr.unideal.server.backend.domain.user.dto.CustomUserDetails;
 import kr.unideal.server.backend.domain.user.dto.request.LogInRequestDTO;
@@ -14,6 +18,7 @@ import kr.unideal.server.backend.domain.user.repository.EmailRepository;
 import kr.unideal.server.backend.domain.user.repository.UserRepository;
 
 
+import kr.unideal.server.backend.security.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -35,15 +40,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ValidatorService validatorService;
-    private final MailService mailService;
+    private final CookieUtil cookieUtil;
     private final JwtTokenProvider tokenProvider;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final EmailRepository emailRepository;
-
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisUtil redisUtil;
 
     //회원가입 db 등록 method
     public void register(SignUpRequestDTO dto) {
-
         if (!validatorService.isGachonUnivStudent(dto.getEmail())) {
             throw new IllegalArgumentException("가천대학교 학생 이메일이 아닙니다.");
         }
@@ -57,7 +62,7 @@ public class UserService {
 
 
     //로그인 정보 확인 method
-    public LogInResponseDTO login(LogInRequestDTO dto) {
+    public LogInResponseDTO login(LogInRequestDTO dto, HttpServletResponse response) {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
 
@@ -75,12 +80,12 @@ public class UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = tokenProvider.generateAccessToken(authentication);
-        tokenProvider.generateRefreshToken(authentication);
+        String refreshToken = tokenProvider.generateRefreshToken(authentication);
+
+        setRefreshTokenCookie(refreshToken, response);
 
         return LogInResponseDTO.from(user.getEmail(), accessToken);
     }
-
-
 
     // 인증
     @Transactional
@@ -114,14 +119,6 @@ public class UserService {
     }
 
 
-    // 인증토큰 발급
-//    public void issueVerificationCode(User user) {
-//        String verificationCode = VerificationCodeUtils.generateVerificationCode();
-//
-//        user.setVerificationToken(verificationCode);
-//        mailService.sendVerificationCode(user.getEmail(), verificationCode);
-//    }
-
     // 로그아웃
     public void logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -139,16 +136,50 @@ public class UserService {
         }
     }
 
-    //회원 탈퇴
-    public void deleteuser(Long id) {
+    // 재발급
+    public String reissue(HttpServletRequest request, HttpServletResponse response) {
+        //  1. 쿠키에서 Refresh Token 꺼내기
+        String refreshToken = cookieUtil.getRefreshTokenFromCookies(request);
+
+        // 2. Refresh Token 유효성 검증
+        if (!tokenProvider.validateToken(refreshToken)) {
+            throw new CustomException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+        }
+
+        // 3. Refresh Token에서 userId 추출
+        Long userId = tokenProvider.getUserIdFromToken(refreshToken);
+
+        // 4. Redis에서 저장된 Refresh Token 조회
+        String storedRefreshToken = (String) redisUtil.getRefreshToken(userId);
+
+        //  5. 일치 여부 확인
+        if (!refreshToken.equals(storedRefreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        //  6. 인증 정보 생성
+        Authentication authentication = tokenProvider.getAuthentication(refreshToken);
+
+        //  7. 새로운 토큰 발급
+        String newAccessToken = tokenProvider.generateAccessToken(authentication);
+        String newRefreshToken = tokenProvider.generateRefreshToken(authentication);
+
+        //  8. Redis 갱신
+        redisUtil.deleteRefreshToken(userId);
+        redisUtil.setRefreshToken(userId, newRefreshToken);
+
+        //  9. 새 Refresh Token 쿠키에 저장
+        setRefreshTokenCookie(newRefreshToken, response);
+
+
+        return newAccessToken;
     }
 
-    /// refreshToken 재발급
-    public String reissue(String refreshToken, HttpServletResponse response) {
-
-
-        return null;
+    // 쿠키에 RefreshToken 설정
+    public void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {
+        cookieUtil.setCookie(refreshToken, response);
     }
+
 
     // 유저 검색
     public User loaduser(Long userId) {

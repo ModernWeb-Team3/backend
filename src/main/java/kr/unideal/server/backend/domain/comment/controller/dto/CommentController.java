@@ -43,7 +43,7 @@ public class CommentController {
     @PatchMapping("/comments/{commentId}/private")
     public ApiResponse<String> toggleCommentPrivate(@CurrentUserId Long userId,
                                                     @PathVariable Long commentId) {
-        boolean newSecretStatus = commentService.toggleCommentSecret(userId, commentId);
+        boolean newSecretStatus = commentService.setCommentSecret(userId, commentId);
         String message = newSecretStatus ? "비밀글로 설정되었습니다." : "비밀글 해제되었습니다.";
         return ApiResponse.ok(message);
     }
@@ -66,21 +66,4 @@ public class CommentController {
         return ApiResponse.ok("댓글이 삭제되었습니다.");
     }
 
-
-    // 대댓글 수정
-    @PatchMapping("comments/{commentId}/replies")
-    public ApiResponse<String> updateReply(@CurrentUserId Long userId,
-                                           @PathVariable Long commentId,
-                                           @RequestBody CommentUpdatedRequest request) {
-        commentService.updateReply(userId, commentId, request);
-        return ApiResponse.ok("대댓글이 수정되었습니다.");
-    }
-
-    // 대댓글 삭제
-    @DeleteMapping("comments/{commentId}/replies")
-    public ApiResponse<String> deleteReply(@CurrentUserId Long userId,
-                                           @PathVariable Long commentId) {
-        commentService.deleteComment(userId, commentId);
-        return ApiResponse.ok("대댓글이 삭제되었습니다.");
-    }
 }

@@ -50,17 +50,6 @@ public class MailService {
     }
 
 
-    // 코드 검증
-//    public boolean verifyCode(String email, String code) {
-//        return emailRepository.findByEmailAndCode(email, code)
-//                .filter(vc -> vc.getExpiresTime().isAfter(LocalDateTime.now())) // 유효성 검사
-//                .map(vc -> {
-//                    emailRepository.delete(vc); // 검증 후 삭제
-//                    return true;
-//                })
-//                .orElseThrow(() -> new NotVerifiedException("유효하지 않거나 만료된 코드입니다."));
-//    }
-
     @Scheduled(cron = "0 0 12 * * *") // 매일 정오(12:00 PM) 실행
     public void deleteExpiredCodes() {
         emailRepository.deleteByExpiresTimeBefore(LocalDateTime.now());
