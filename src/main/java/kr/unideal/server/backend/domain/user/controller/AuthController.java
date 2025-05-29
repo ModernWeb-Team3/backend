@@ -70,24 +70,25 @@ public class AuthController {
 
     // 로그인
     @PostMapping("/auth/login")
-    public ApiResponse<LogInResponseDTO> login(
+    public ApiResponse<String> login(
             @RequestBody LogInRequestDTO logInRequestDTO,
             BindingResult bindingResult,HttpServletResponse response
+
     ) {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException("입력값 규격이 올바르지 않습니다.");
         }
 
 
-        LogInResponseDTO user = userService.login(logInRequestDTO);
+        LogInResponseDTO user = userService.login(logInRequestDTO,response);
         addAccessTokenHeader(user.getJwtToken(),response);
-        return ApiResponse.ok(user);
+        return ApiResponse.ok("로그인이 성공적으로 완료되었습니다.");
 
 
     }
 
     //로그아웃
-    @PostMapping("/logout")
+    @PostMapping("/auth/logout")
     public ApiResponse<String> logout() {
         userService.logout();
         return ApiResponse.ok("성공적으로 로그아웃 되었습니다.");
@@ -103,7 +104,7 @@ public class AuthController {
 
 
     // refresh 토큰으로 accessToken, refreshToken을 재발급
-    @PostMapping("/reissue")
+    @PostMapping("/auth/reissue")
     public ApiResponse<String> reissue(@RequestHeader(REFRESH_TOKEN_SUBJECT) String refreshToken, HttpServletResponse response) {
         String accessToken = userService.reissue(refreshToken, response);
         addAccessTokenHeader(accessToken, response);

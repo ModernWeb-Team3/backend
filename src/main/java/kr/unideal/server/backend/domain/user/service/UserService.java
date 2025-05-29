@@ -2,6 +2,7 @@ package kr.unideal.server.backend.domain.user.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.unideal.server.backend.security.util.CookieUtil;
 import kr.unideal.server.backend.security.util.JwtTokenProvider;
 import kr.unideal.server.backend.domain.user.dto.CustomUserDetails;
 import kr.unideal.server.backend.domain.user.dto.request.LogInRequestDTO;
@@ -35,10 +36,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ValidatorService validatorService;
-    private final MailService mailService;
+    private final CookieUtil cookieUtil;
     private final JwtTokenProvider tokenProvider;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final EmailRepository emailRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     //회원가입 db 등록 method
@@ -57,7 +59,7 @@ public class UserService {
 
 
     //로그인 정보 확인 method
-    public LogInResponseDTO login(LogInRequestDTO dto) {
+    public LogInResponseDTO login(LogInRequestDTO dto, HttpServletResponse response) {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
 
@@ -75,12 +77,12 @@ public class UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = tokenProvider.generateAccessToken(authentication);
-        tokenProvider.generateRefreshToken(authentication);
+        String refreshToken=tokenProvider.generateRefreshToken(authentication);
+
+        setRefreshTokenCookie(refreshToken, response);
 
         return LogInResponseDTO.from(user.getEmail(), accessToken);
     }
-
-
 
     // 인증
     @Transactional
@@ -145,10 +147,33 @@ public class UserService {
 
     /// refreshToken 재발급
     public String reissue(String refreshToken, HttpServletResponse response) {
+        if (!tokenProvider.validateToken(refreshToken)) {
+            throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
+        }
 
+        // Refresh Token에서 사용자 정보 추출
+        Authentication authentication = tokenProvider.getAuthentication(refreshToken);
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        return null;
+        // 새로운 Access Token 발급
+        String newAccessToken = tokenProvider.generateAccessToken(authentication);
+
+        // 새로운 Refresh Token 발급
+        String newRefreshToken = tokenProvider.generateRefreshToken(authentication);
+
+        // 쿠키에 새로 발급한 Refresh Token 설정
+        setRefreshTokenCookie(newRefreshToken, response);
+
+        log.info("🔄 Refresh Token 재발급 완료 - userId: {}", userDetails.getId());
+        return newAccessToken;
     }
+
+    // 쿠키에 RefreshToken 설정 (HttpServletResponse 필요)
+    public void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {
+        cookieUtil.setCookie(refreshToken, response);
+        log.info("🍪 쿠키에 RefreshToken 저장 완료 - key: {}", refreshToken);
+    }
+
 
     // 유저 검색
     public User loaduser(Long userId) {
