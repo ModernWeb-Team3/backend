@@ -48,11 +48,17 @@
     },
     "refresh": {
       "expiration": 604800000
-    }
+    },
+    "cookieMaxAge": 604800000,
+    "cookiePathOption": "/",
+    "secureOption": true
   },
   "springdoc": {
     "api-docs": {
       "path": "/v3/api-docs"
+    },
+    "swagger-ui": {
+      "path": "/swagger-ui.html"
     }
   },
   "unideal": {
