@@ -28,8 +28,8 @@ public class CookieUtil {
     // 쿠키 설정
     public void setCookie(String refreshToken, HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken) // name, value 순서
-                .maxAge(cookieMaxAge)
-                .path(cookiePathOption)
+                .maxAge(604800000)
+                .path("/")
                 .secure(true)
                 .httpOnly(true)
                 .sameSite("None")
