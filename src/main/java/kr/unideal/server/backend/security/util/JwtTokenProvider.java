@@ -174,4 +174,25 @@ public class JwtTokenProvider {
             throw new CustomJWTException("토큰 검증에 실패했습니다.");
         }
     }
+
+
+    public String generateMasterToken(Long userId, String email, List<String> roles) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME);
+
+        String roleStr = String.join(",", roles);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", roleStr);
+        claims.put("userId", userId);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(secretKey, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
 }
