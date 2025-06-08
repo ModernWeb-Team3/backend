@@ -31,8 +31,8 @@ public class JwtTokenProvider {
     private String key; // ✔️ 문자열로 주입
     private final RedisUtil redisUtil;
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30 * 30L;
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60L * 24 * 7;
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30 * 100* 30L;
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 100* 60L * 24 * 7;
     private final UserRepository userRepository;
 
     private SecretKey secretKey;
