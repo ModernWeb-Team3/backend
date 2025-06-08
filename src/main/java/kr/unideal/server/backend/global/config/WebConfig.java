@@ -23,23 +23,23 @@ public class WebConfig implements WebMvcConfigurer {
         resolvers.add(currentUserIdArgumentResolver);
     }
 
-
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOriginPatterns(
-                        "http://localhost:3000",
-                        "http://localhost:8080",
-                        "https://staging-api.unideal.kr",
-                        "https://staging.unideal.kr",
-                        "https://staging-front.unideal.kr",
-                        "https://unideal.kr",
-                        "https://front.unideal.kr"
-                )
-                .allowedMethods("GET", "POST","PATCH", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600);
-    }
+//
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**")
+//                .allowedOriginPatterns(
+//                        "http://localhost:3000",
+//                        "http://localhost:8080",
+//                        "https://staging-api.unideal.kr",
+//                        "https://staging.unideal.kr",
+//                        "https://staging-front.unideal.kr",
+//                        "https://unideal.kr",
+//                        "https://front.unideal.kr"
+//                )
+//                .allowedMethods("GET", "POST","PATCH", "PUT", "DELETE", "OPTIONS")
+//                .allowedHeaders("*")
+//                .allowCredentials(true)
+//                .maxAge(3600);
+//    }
 
 
 }
