@@ -23,22 +23,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtTokenProvider jwtTokenProvider) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // ✅ CORS 활성화
-
+                .cors(Customizer.withDefaults())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .authorizeHttpRequests((requests) -> requests
-                        .anyRequest().permitAll()
+                .authorizeHttpRequests(
+                        requests -> requests.anyRequest().permitAll() // 모든 요청을 인증 없이 허용
                 )
-
-//                .authorizeHttpRequests(
-//                        (requests) -> requests
-//                                .requestMatchers(
-//                                        "/auth/email", "/auth/validate", "/auth/signup", "/auth/login",
-//                                        "/swagger-ui/**", "/v3/api-docs/**").permitAll() // 위 경로들은 인증 없이 접근 허용
-//                                .anyRequest().authenticated()
-//                )
                 .csrf(csrf -> csrf.disable())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
@@ -49,7 +40,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(List.of(
+        // setAllowedOrigins로 변경 (Spring Boot 버전에 따라 더 호환성 높음)
+        config.setAllowedOrigins(List.of(
                 "https://unideal-aa9on0jye-dahhyeons-projects.vercel.app",
                 "http://localhost:3000",
                 "http://localhost:8080",
@@ -69,5 +61,4 @@ public class SecurityConfig {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
