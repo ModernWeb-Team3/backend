@@ -4,6 +4,7 @@ import kr.unideal.server.backend.security.filter.JwtAuthenticationFilter;
 import kr.unideal.server.backend.security.util.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,12 +24,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtTokenProvider jwtTokenProvider) throws Exception {
         http
-                .cors(Customizer.withDefaults())
+                .cors(Customizer.withDefaults()) // ✅ CORS 활성화
+                .csrf(csrf -> csrf.disable())
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(
-                        requests -> requests.anyRequest().permitAll() // 모든 요청을 인증 없이 허용
+                        (requests) -> requests
+                                .requestMatchers(
+                                        HttpMethod.OPTIONS,"/**",
+                                        "/auth/email", "/auth/validate", "/auth/signup", "/auth/login",
+                                        "/swagger-ui/**", "/v3/api-docs/**").permitAll() // 위 경로들은 인증 없이 접근 허용
+                                .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf.disable())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
@@ -40,15 +49,13 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        // setAllowedOrigins로 변경 (Spring Boot 버전에 따라 더 호환성 높음)
         config.setAllowedOrigins(List.of(
-                "https://unideal-aa9on0jye-dahhyeons-projects.vercel.app",
                 "http://localhost:3000",
-                "http://localhost:8080",
-                "https://staging-api.unideal.kr",
+                "https://unideal-aa9on0jye-dahhyeons-projects.vercel.app",
                 "https://staging.unideal.kr"
         ));
-        config.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
+
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setMaxAge(3600L);
 
@@ -61,4 +68,5 @@ public class SecurityConfig {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
