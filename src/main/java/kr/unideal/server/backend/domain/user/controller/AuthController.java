@@ -112,6 +112,10 @@ public class AuthController {
     }
 
 
+    @GetMapping("/auth/userId")
+    public ApiResponse<Long> getUserId(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResponse.ok(userDetails.getId());
+    }
     private void addAccessTokenHeader(String accessToken, HttpServletResponse response) {
         response.setHeader(AUTH_HEADER, accessToken);
     }
