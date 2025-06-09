@@ -1,10 +1,12 @@
 package kr.unideal.server.backend.domain.post.controller.dto.request;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
+@Builder
 public class PostRequest {
 
     private String name;

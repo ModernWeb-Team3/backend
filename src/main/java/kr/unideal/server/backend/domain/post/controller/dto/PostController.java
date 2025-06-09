@@ -21,7 +21,6 @@ public class PostController {
     // 새로운 게시글을 생성 -
     @PostMapping
     public ApiResponse<String> createPost(@CurrentUserId Long userId, @RequestBody PostRequest request) {
-        System.out.println("User ID: " + userId);
         postService.createPost(request,userId);
         return ApiResponse.ok("게시글이 생성되었습니다.");
     }
